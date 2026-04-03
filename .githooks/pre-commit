@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ "${CODEX_ALLOW_HAZARDS:-0}" == "1" ]]; then exit 0; fi
+forbidden='(^|/)(\.tmp/|\.auth/|chromium-profile/|node_modules/|\.venv/)|(^|/)\.env(\.|$)|backup'
+staged="$(git diff --cached --name-only)"
+[[ -n "$staged" ]] || exit 0
+bad=0
+while IFS= read -r f; do
+  echo "$f" | grep -Eiq "$forbidden" && { echo "BLOCKED: $f" >&2; bad=1; }
+done <<< "$staged"
+[[ "$bad" -eq 0 ]] || exit 1

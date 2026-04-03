@@ -1,0 +1,11 @@
+
+# Codex guardrails
+.tmp/
+.auth/
+**/chromium-profile/
+.DS_Store
+node_modules/
+.venv/
+.env
+.env.*
+*backup*
