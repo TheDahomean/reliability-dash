@@ -1,0 +1,2998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PS Farms Reliability Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <style>
+    :root {
+      --bg: #efe3cf;
+      --panel: rgba(255, 248, 238, 0.94);
+      --panel-strong: #fff7ed;
+      --ink: #182018;
+      --muted: #4f584d;
+      --line: rgba(24, 32, 24, 0.14);
+      --incubation: #1f5fbf;
+      --incubation-soft: #eaf2ff;
+      --fruiting: #d97706;
+      --fruiting-soft: #fff1df;
+      --harvest: #198754;
+      --harvest-soft: #eaf8ef;
+      --contamination: #c62828;
+      --contamination-soft: #fff0ee;
+      --slow: #ff5a1f;
+      --moderate: #f2b705;
+      --good: #10a44f;
+      --risk: #ff2b2b;
+      --warn: #7c3aed;
+      --accent: #0d5c49;
+      --shadow: 0 24px 60px rgba(55, 31, 7, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(13, 92, 73, 0.22), transparent 34%),
+        radial-gradient(circle at top right, rgba(229, 107, 47, 0.18), transparent 30%),
+        linear-gradient(180deg, #f7ead5 0%, #edd9bd 100%);
+      min-height: 100vh;
+    }
+
+    body.gate-locked {
+      overflow: hidden;
+    }
+
+    body.gate-locked .shell,
+    body.gate-locked .chart-tooltip {
+      display: none;
+    }
+
+    .access-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top left, rgba(13, 92, 73, 0.24), transparent 34%),
+        radial-gradient(circle at top right, rgba(229, 107, 47, 0.22), transparent 30%),
+        rgba(21, 15, 8, 0.68);
+      backdrop-filter: blur(10px);
+    }
+
+    body.gate-locked .access-gate {
+      display: flex;
+    }
+
+    .access-panel {
+      width: min(520px, 100%);
+      padding: 28px;
+      border-radius: 24px;
+      background: rgba(255, 248, 238, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: 0 28px 72px rgba(24, 18, 10, 0.24);
+    }
+
+    .access-kicker {
+      margin: 0 0 10px;
+      font: 700 0.75rem/1.2 Arial, sans-serif;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #0d5c49;
+    }
+
+    .access-panel h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 2.7rem);
+      line-height: 1.02;
+    }
+
+    .access-copy {
+      margin: 0 0 18px;
+      color: #324132;
+      font: 500 1rem/1.55 Arial, sans-serif;
+    }
+
+    .access-form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .access-form label {
+      font: 700 0.8rem/1.2 Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #415045;
+    }
+
+    .access-form input {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(24, 32, 24, 0.16);
+      background: #fff;
+      color: #182018;
+      padding: 14px 16px;
+      font: 500 1rem/1.3 Arial, sans-serif;
+      outline: none;
+    }
+
+    .access-form input:focus {
+      border-color: rgba(13, 92, 73, 0.46);
+      box-shadow: 0 0 0 4px rgba(13, 92, 73, 0.12);
+    }
+
+    .access-form button {
+      width: auto;
+      min-width: 170px;
+      text-align: center;
+      background: #0d5c49;
+      border-color: #0d5c49;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .access-form button:hover {
+      background: #11705a;
+    }
+
+    .access-error {
+      min-height: 1.2em;
+      color: #9b2226;
+      font: 600 0.92rem/1.4 Arial, sans-serif;
+    }
+
+    .access-note {
+      margin: 8px 0 0;
+      color: #566455;
+      font: 500 0.88rem/1.5 Arial, sans-serif;
+    }
+
+    .snapshot-banner {
+      margin-bottom: 18px;
+      padding: 16px 18px;
+      border-left: 6px solid #0d5c49;
+    }
+
+    .snapshot-banner.warning {
+      border-left-color: #b96c08;
+      background: #fff4de;
+    }
+
+    .snapshot-banner.alert {
+      border-left-color: #b42318;
+      background: #fff0ee;
+    }
+
+    .snapshot-banner-title {
+      margin: 0 0 6px;
+      font: 700 0.92rem/1.3 Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #415045;
+    }
+
+    .snapshot-banner-copy {
+      margin: 0;
+      color: #324132;
+      font: 500 0.95rem/1.55 Arial, sans-serif;
+    }
+
+    .snapshot-static-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font: 500 0.85rem/1.45 Arial, sans-serif;
+    }
+
+    .snapshot-chart-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .snapshot-chart-item {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 248, 238, 0.92);
+      border: 1px solid rgba(24, 32, 24, 0.1);
+    }
+
+    .snapshot-chart-item strong {
+      display: block;
+      margin-bottom: 4px;
+      font: 700 0.95rem/1.3 Arial, sans-serif;
+    }
+
+    .shell {
+      width: min(1240px, calc(100vw - 32px));
+      margin: 24px auto 48px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      align-items: stretch;
+      margin-bottom: 20px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.52);
+      box-shadow: var(--shadow);
+      border-radius: 24px;
+      backdrop-filter: blur(12px);
+    }
+
+    .panel.stage-incubation,
+    .kpi.stage-incubation,
+    .yield-summary-card.stage-incubation,
+    .batch-card.stage-incubation {
+      background: var(--incubation-soft);
+      border-color: rgba(31, 95, 191, 0.18);
+    }
+
+    .panel.stage-fruiting,
+    .kpi.stage-fruiting,
+    .yield-summary-card.stage-fruiting,
+    .yield-card.stage-fruiting {
+      background: var(--fruiting-soft);
+      border-color: rgba(217, 119, 6, 0.18);
+    }
+
+    .kpi.stage-harvest,
+    .yield-summary-card.stage-harvest,
+    .yield-card.stage-harvest {
+      background: var(--harvest-soft);
+      border-color: rgba(25, 135, 84, 0.18);
+    }
+
+    .panel.stage-contamination,
+    .kpi.stage-contamination,
+    .yield-summary-card.stage-contamination,
+    .batch-card.stage-contamination,
+    .yield-card.stage-contamination,
+    .event-row.stage-contamination {
+      background: var(--contamination-soft);
+      border-color: rgba(198, 40, 40, 0.18);
+    }
+
+    .hero-main {
+      padding: 30px 30px 26px;
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero-main::after {
+      content: "";
+      position: absolute;
+      inset: auto -60px -70px auto;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(13, 92, 73, 0.20), transparent 68%);
+      pointer-events: none;
+    }
+
+    .eyebrow,
+    .section-label {
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font: 600 0.72rem/1.2 Arial, sans-serif;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 3.5vw, 3.8rem);
+      line-height: 0.95;
+      max-width: 24ch;
+      text-wrap: balance;
+    }
+
+    .hero-copy {
+      max-width: 62ch;
+      margin: 0;
+      color: #243127;
+      font-size: 1rem;
+      line-height: 1.55;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+      font: 600 0.8rem/1.2 Arial, sans-serif;
+      color: var(--muted);
+    }
+
+    .tag {
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid rgba(24, 32, 24, 0.10);
+    }
+
+    .tag.warning {
+      background: rgba(255, 239, 205, 0.94);
+      border-color: rgba(166, 104, 17, 0.30);
+      color: #7c4c00;
+    }
+
+    .tag.alert {
+      background: rgba(255, 224, 224, 0.96);
+      border-color: rgba(166, 42, 42, 0.26);
+      color: #8e2323;
+    }
+
+    .filter-block label {
+      display: block;
+      margin-bottom: 8px;
+      font: 600 0.78rem/1.2 Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: rgba(239, 246, 240, 0.74);
+    }
+
+    select,
+    button {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      padding: 12px 14px;
+      font: 500 0.96rem/1.3 Arial, sans-serif;
+      outline: none;
+    }
+
+    button {
+      cursor: pointer;
+      text-align: left;
+      transition: background 140ms ease, opacity 140ms ease;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.20);
+    }
+
+    button:disabled {
+      cursor: wait;
+      opacity: 0.7;
+    }
+
+    option {
+      color: #111;
+    }
+
+    .legend {
+      display: grid;
+      gap: 10px;
+    }
+
+    .palette-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .palette-card {
+      display: grid;
+      grid-template-columns: 14px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .palette-card .swatch {
+      margin-top: 2px;
+    }
+
+    .palette-title {
+      font: 700 0.88rem/1.2 Arial, sans-serif;
+      color: rgba(255, 255, 255, 0.98);
+      margin-bottom: 2px;
+    }
+
+    .palette-note {
+      font: 500 0.78rem/1.35 Arial, sans-serif;
+      color: rgba(239, 246, 240, 0.78);
+    }
+
+    .control-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .control-note {
+      min-height: 1.2em;
+      font: 500 0.85rem/1.4 Arial, sans-serif;
+      color: rgba(239, 246, 240, 0.74);
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font: 600 0.94rem/1.3 Arial, sans-serif;
+      color: rgba(255, 255, 255, 0.96);
+    }
+
+    .swatch {
+      width: 13px;
+      height: 13px;
+      border-radius: 999px;
+      display: inline-block;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.72), 0 0 0 3px rgba(10, 18, 12, 0.28);
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .kpis {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      margin-bottom: 18px;
+    }
+
+    .kpi {
+      padding: 20px;
+      border-left: 6px solid transparent;
+    }
+
+    .kpi.stage-incubation { border-left-color: var(--incubation); }
+    .kpi.stage-fruiting { border-left-color: var(--fruiting); }
+    .kpi.stage-harvest { border-left-color: var(--harvest); }
+    .kpi.stage-contamination { border-left-color: var(--contamination); }
+
+    .kpi-value {
+      font-size: clamp(2rem, 3vw, 3rem);
+      line-height: 1;
+      margin: 10px 0 8px;
+    }
+
+    .kpi-note {
+      color: var(--muted);
+      font: 500 0.92rem/1.45 Arial, sans-serif;
+    }
+
+    .decision-panels {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 18px;
+      align-items: stretch;
+    }
+
+    .decision-body {
+      display: grid;
+      gap: 12px;
+    }
+
+    .decision-highlight {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 251, 246, 0.94);
+      border: 1px solid rgba(24, 32, 24, 0.10);
+    }
+
+    .decision-highlight-value {
+      font: 700 1.95rem/1 Georgia, "Times New Roman", serif;
+      letter-spacing: -0.03em;
+    }
+
+    .decision-highlight-label {
+      margin-top: 6px;
+      color: var(--muted);
+      font: 600 0.82rem/1.35 Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .decision-inline-metrics {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .decision-inline-card {
+      padding: 12px 13px;
+      border-radius: 14px;
+      background: rgba(255, 251, 246, 0.92);
+      border: 1px solid rgba(24, 32, 24, 0.08);
+    }
+
+    .decision-inline-value {
+      font: 700 1.05rem/1.15 Arial, sans-serif;
+    }
+
+    .decision-inline-label {
+      margin-top: 5px;
+      color: var(--muted);
+      font: 600 0.74rem/1.35 Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .decision-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .decision-list-item {
+      display: grid;
+      grid-template-columns: 10px 1fr;
+      gap: 10px;
+      align-items: start;
+      color: #314033;
+      font: 500 0.92rem/1.5 Arial, sans-serif;
+    }
+
+    .decision-list-item::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      margin-top: 0.35rem;
+      border-radius: 999px;
+      background: rgba(13, 92, 73, 0.7);
+    }
+
+    .promise-method {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .promise-method-card {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .promise-method-title {
+      font: 700 0.84rem/1.2 Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .promise-method-copy {
+      margin-top: 8px;
+      color: rgba(239, 246, 240, 0.84);
+      font: 500 0.9rem/1.5 Arial, sans-serif;
+    }
+
+    .support-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+      align-items: start;
+    }
+
+    .support-controls {
+      display: grid;
+      gap: 14px;
+    }
+
+    .support-controls .filter-block label,
+    .support-controls .control-note {
+      color: var(--muted);
+    }
+
+    .support-controls select,
+    .support-controls button {
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--ink);
+      border-color: rgba(24, 32, 24, 0.12);
+    }
+
+    .support-controls button:hover {
+      background: rgba(255, 255, 255, 1);
+    }
+
+    .support-controls .focus-chip {
+      background: rgba(255, 255, 255, 0.92);
+      border-color: rgba(24, 32, 24, 0.10);
+      color: #314033;
+    }
+
+    .support-controls .focus-chip.muted {
+      color: var(--muted);
+    }
+
+    .support-controls .focus-chip.warning {
+      background: rgba(255, 239, 205, 0.94);
+      border-color: rgba(166, 104, 17, 0.22);
+      color: #7c4c00;
+    }
+
+    .support-controls .focus-chip.alert {
+      background: rgba(255, 224, 224, 0.96);
+      border-color: rgba(166, 42, 42, 0.22);
+      color: #8e2323;
+    }
+
+    .layout {
+      grid-template-columns: 1.3fr 0.7fr;
+      align-items: start;
+    }
+
+    .section {
+      padding: 22px;
+      border-top: 5px solid transparent;
+    }
+
+    .section.stage-incubation { border-top-color: var(--incubation); }
+    .section.stage-fruiting { border-top-color: var(--fruiting); }
+    .section.stage-contamination { border-top-color: var(--contamination); }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+
+    .section h2 {
+      margin: 0;
+      font-size: 1.55rem;
+    }
+
+    .section-note {
+      color: var(--muted);
+      font: 500 0.88rem/1.4 Arial, sans-serif;
+    }
+
+    .chart-frame {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(24, 32, 24, 0.10);
+      border-radius: 18px;
+      padding: 12px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      position: relative;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .chart-enter {
+      animation: chartSlideIn 520ms ease-out both;
+    }
+
+    .chart-enter-soft {
+      animation: chartFadeIn 540ms ease-out both;
+    }
+
+    .chart-bar {
+      transform-box: fill-box;
+      transform-origin: center bottom;
+    }
+
+    .chart-point {
+      transform-box: fill-box;
+      transform-origin: center center;
+    }
+
+    .chart-interactive {
+      cursor: pointer;
+      transition: filter 140ms ease, transform 140ms ease;
+    }
+
+    .chart-interactive:hover {
+      filter: brightness(1.06) saturate(1.12);
+    }
+
+    .chart-tooltip {
+      position: fixed;
+      z-index: 9999;
+      max-width: 280px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(24, 32, 24, 0.94);
+      color: #fff;
+      font: 600 0.78rem/1.35 Arial, sans-serif;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 120ms ease, transform 120ms ease;
+      white-space: normal;
+    }
+
+    .chart-tooltip.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes chartSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes chartFadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 18px;
+      margin: 0 0 10px;
+      font: 600 0.84rem/1.35 Arial, sans-serif;
+      color: var(--muted);
+    }
+
+    .chart-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chart-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      display: inline-block;
+      background: currentColor;
+    }
+
+    .chart-dot.ring-risk {
+      background: radial-gradient(circle, #fff 32%, rgba(255,255,255,0.2) 33%);
+      border: 3px solid var(--risk);
+      box-shadow: 0 0 0 3px rgba(255, 43, 43, 0.22);
+    }
+
+    .chart-dot.ring-warn {
+      background: radial-gradient(circle, #fff 32%, rgba(255,255,255,0.2) 33%);
+      border: 3px solid var(--warn);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.22);
+    }
+
+    .chart-dot.dual-alert {
+      background: #fff;
+      border: 3px solid transparent;
+      border-left-color: var(--risk);
+      border-top-color: var(--risk);
+      border-right-color: var(--warn);
+      border-bottom-color: var(--warn);
+      box-shadow: 0 0 0 2px rgba(24, 32, 24, 0.18);
+    }
+
+    .batch-cards {
+      display: grid;
+      gap: 12px;
+    }
+
+    .batch-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: var(--panel-strong);
+      border: 1px solid rgba(24, 32, 24, 0.10);
+      border-left: 6px solid transparent;
+      cursor: pointer;
+      transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+    }
+
+    .batch-card:hover,
+    .event-row:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(55, 31, 7, 0.10);
+    }
+
+    .batch-card.active-focus,
+    .event-row.active-focus {
+      box-shadow: 0 0 0 2px rgba(13, 92, 73, 0.22), var(--shadow);
+      border-color: rgba(13, 92, 73, 0.22);
+    }
+
+    .batch-card header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .batch-title {
+      font: 700 1rem/1.2 Arial, sans-serif;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font: 700 0.75rem/1 Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .pill.slow { background: rgba(234, 91, 31, 0.20); color: var(--slow); }
+    .pill.moderate { background: rgba(229, 177, 0, 0.20); color: #805f00; }
+    .pill.good { background: rgba(15, 143, 72, 0.18); color: var(--good); }
+    .pill.risk { background: rgba(194, 43, 22, 0.18); color: var(--risk); }
+
+    .mini-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      font: 600 0.82rem/1.35 Arial, sans-serif;
+      color: var(--muted);
+    }
+
+    .mini-stats strong {
+      display: block;
+      color: var(--ink);
+      font-size: 1rem;
+      margin-bottom: 2px;
+    }
+
+    .focus-note {
+      margin-top: 12px;
+      font: 500 0.9rem/1.5 Arial, sans-serif;
+      color: #324034;
+    }
+
+    .events {
+      display: grid;
+      gap: 10px;
+    }
+
+    .yield-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .production-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .yield-summary {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 14px;
+    }
+
+    .yield-summary-card {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255, 251, 246, 0.96);
+      border: 1px solid rgba(24, 32, 24, 0.10);
+      border-left: 6px solid transparent;
+    }
+
+    .yield-summary-value {
+      font: 700 1.35rem/1 Arial, sans-serif;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .yield-summary-label {
+      font: 600 0.8rem/1.35 Arial, sans-serif;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .yield-summary-note {
+      margin-top: 8px;
+      font: 500 0.78rem/1.35 Arial, sans-serif;
+      color: var(--muted);
+    }
+
+    .yield-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 251, 246, 0.96);
+      border: 1px solid rgba(24, 32, 24, 0.10);
+      border-left: 6px solid var(--fruiting);
+    }
+
+    .focus-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: auto;
+      margin-top: 8px;
+      margin-right: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(13, 92, 73, 0.08);
+      border: 1px solid rgba(13, 92, 73, 0.14);
+      color: var(--accent);
+      font: 700 0.78rem/1.2 Arial, sans-serif;
+      text-align: center;
+    }
+
+    .focus-link:hover {
+      background: rgba(13, 92, 73, 0.14);
+    }
+
+    .yield-card.full-span {
+      grid-column: 1 / -1;
+    }
+
+    #focusedBatchPanel[hidden] {
+      display: none;
+    }
+
+    .yield-summary-card.stage-incubation { border-left-color: var(--incubation); }
+    .yield-summary-card.stage-fruiting { border-left-color: var(--fruiting); }
+    .yield-summary-card.stage-harvest { border-left-color: var(--harvest); }
+    .yield-summary-card.stage-contamination { border-left-color: var(--contamination); }
+
+    .yield-topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .yield-title {
+      font: 700 1rem/1.2 Arial, sans-serif;
+    }
+
+    .yield-kilo {
+      font: 700 1.2rem/1 Arial, sans-serif;
+      color: var(--harvest);
+    }
+
+    .yield-meta {
+      font: 600 0.82rem/1.45 Arial, sans-serif;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .yield-note {
+      font: 500 0.9rem/1.5 Arial, sans-serif;
+      color: #314033;
+    }
+
+    .event-row {
+      display: grid;
+      grid-template-columns: 112px 1fr auto;
+      gap: 12px;
+      align-items: start;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 251, 246, 0.94);
+      border: 1px solid rgba(24, 32, 24, 0.10);
+      border-left: 6px solid var(--contamination);
+      cursor: pointer;
+      transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+    }
+
+    .focus-status {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .focus-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font: 700 0.8rem/1.2 Arial, sans-serif;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .focus-chip.muted {
+      color: rgba(239, 246, 240, 0.70);
+    }
+
+    .focus-chip.warning {
+      background: rgba(255, 204, 102, 0.20);
+      border-color: rgba(255, 204, 102, 0.28);
+      color: #ffe2a6;
+    }
+
+    .focus-chip.alert {
+      background: rgba(255, 119, 119, 0.18);
+      border-color: rgba(255, 119, 119, 0.26);
+      color: #ffd2d2;
+    }
+
+    .focus-reset {
+      width: auto;
+      padding: 8px 12px;
+      border-radius: 999px;
+      text-align: center;
+      font: 700 0.8rem/1.2 Arial, sans-serif;
+    }
+
+    .focus-nav {
+      width: auto;
+      min-width: 0;
+      padding: 8px 12px;
+      border-radius: 999px;
+      text-align: center;
+      font: 700 0.8rem/1.2 Arial, sans-serif;
+    }
+
+    .focus-related {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .focus-related-chip {
+      width: auto;
+      min-width: 0;
+      padding: 7px 10px;
+      border-radius: 999px;
+      text-align: center;
+      font: 700 0.75rem/1.2 Arial, sans-serif;
+    }
+
+    .event-date {
+      font: 700 0.82rem/1.3 Arial, sans-serif;
+      color: #415045;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .event-main {
+      font: 600 0.95rem/1.45 Arial, sans-serif;
+    }
+
+    .event-sub {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .event-score {
+      font: 700 0.9rem/1.2 Arial, sans-serif;
+      color: var(--risk);
+      text-align: right;
+    }
+
+    .footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font: 500 0.88rem/1.5 Arial, sans-serif;
+      text-align: center;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .axis {
+      font: 700 12px Arial, sans-serif;
+      fill: #344037;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .support-grid,
+      .decision-panels,
+      .layout,
+      .kpis,
+      .yield-summary,
+      .yield-grid,
+      .production-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .decision-inline-metrics {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .kpis,
+      .decision-inline-metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <noscript>
+    <style>
+      body.gate-locked {
+        overflow: auto !important;
+      }
+      body.gate-locked .shell,
+      body.gate-locked .chart-tooltip {
+        display: block !important;
+      }
+      body.gate-locked .access-gate {
+        display: none !important;
+      }
+    </style>
+  </noscript>
+</head>
+<body class="gate-locked">
+  <div class="access-gate" id="accessGate">
+    <div class="access-panel">
+      <p class="access-kicker">Protected Access</p>
+      <h1>PS Farms reliability dashboard</h1>
+      <p class="access-copy">
+        Enter the client password to view the customer-facing production reliability snapshot.
+      </p>
+      <form class="access-form" id="accessForm">
+        <label for="accessPassword">Password</label>
+        <input id="accessPassword" name="password" type="password" autocomplete="current-password" />
+        <button type="submit">Open dashboard</button>
+      </form>
+      <div class="access-error" id="accessError" aria-live="polite"></div>
+      <p class="access-note">Password entry is case-insensitive.</p>
+    </div>
+  </div>
+  __SNAPSHOT_BANNER__
+  <div class="shell">
+    <section class="hero">
+      <div class="panel hero-main">
+        <p class="eyebrow">Procurement Reliability View</p>
+        <h1>What volume PS Farms can reliably supply, at what cadence, and with what risk.</h1>
+        <p class="hero-copy">
+          Procurement decision first. The first strip answers available-to-promise volume, weekly cadence, quality,
+          and service risk. Everything below exists only to support confidence in that promise.
+        </p>
+        <div class="hero-meta" id="hero-meta">__SNAPSHOT_HERO_META__</div>
+      </div>
+    </section>
+
+    <section class="grid kpis" id="kpis">__SNAPSHOT_KPIS__</section>
+
+    <section class="grid decision-panels">
+      <article class="panel section stage-harvest">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Decision Support</p>
+            <h2>Recent harvest consistency</h2>
+          </div>
+          <div class="section-note">Measures whether current harvest cadence is stable enough to support repeat purchase timing.</div>
+        </div>
+        <div class="decision-body" id="consistencyPanel">__SNAPSHOT_HARVEST_CONSISTENCY__</div>
+      </article>
+
+      <article class="panel section stage-fruiting">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Decision Support</p>
+            <h2>Current pipeline</h2>
+          </div>
+          <div class="section-note">Shows what is already fruiting, what is near harvest, and what is still too early to count toward a procurement promise.</div>
+        </div>
+        <div class="decision-body" id="pipelinePanel">__SNAPSHOT_PIPELINE__</div>
+      </article>
+
+      <article class="panel section stage-contamination">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Decision Support</p>
+            <h2>Supply risk summary</h2>
+          </div>
+          <div class="section-note">Keeps the top three current threats to cadence visible without dragging raw exception detail into the hero area.</div>
+        </div>
+        <div class="decision-body" id="riskPanel">__SNAPSHOT_RISK_SUMMARY__</div>
+      </article>
+
+      <article class="panel section stage-incubation">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Decision Support</p>
+            <h2>Vendor stability summary</h2>
+          </div>
+          <div class="section-note">Focuses only on vendor exposure that affects the next promise window, not a full operational vendor scorecard.</div>
+        </div>
+        <div class="decision-body" id="vendorStabilityPanel">__SNAPSHOT_VENDOR_STABILITY__</div>
+      </article>
+    </section>
+
+    <article class="panel section stage-incubation">
+      <div class="section-head">
+        <div>
+          <p class="section-label">Layer 3 Controls</p>
+          <h2>Batch drill-down and promise basis</h2>
+        </div>
+        <div class="section-note">Use this only after the top promise strip. It supports validation and provenance, not the initial procurement decision.</div>
+      </div>
+      <div class="support-grid">
+        <div class="support-controls">
+          <div class="filter-block">
+            <label for="batchFilter">Batch drill-down</label>
+            <select id="batchFilter">__SNAPSHOT_FILTER_OPTIONS__</select>
+          </div>
+          <div class="control-note">The top promise metrics stay portfolio-wide. The selector changes only the layer-3 supporting detail below.</div>
+          <div class="focus-status" id="focusStatus">__SNAPSHOT_FOCUS_STATUS__</div>
+        </div>
+        <div class="promise-method">
+          <div class="promise-method-card">
+            <div class="promise-method-title">Promise Basis</div>
+            <div class="promise-method-copy">Next-7 ATP comes from the live fruiting run-rate only. Next-14 ATP adds a conservative share of day-13+ pipeline using realized kg per prepared bag.</div>
+          </div>
+          <div class="promise-method-card">
+            <div class="promise-method-title">Cadence Rule</div>
+            <div class="promise-method-copy">Minimum reliable weekly MOQ is the lower of last week’s shipped volume and the current next-7 ATP.</div>
+          </div>
+          <div class="promise-method-card">
+            <div class="promise-method-title">Confidence Rule</div>
+            <div class="promise-method-copy">Problem batches are excluded from ATP. Ops detail stays lower on the page as proof of control, not as the first story.</div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="panel section stage-incubation" id="focusedBatchPanel" __SNAPSHOT_FOCUSED_BATCH_HIDDEN__>
+      <div class="section-head">
+        <div>
+          <p class="section-label">Layer 3 Drill-down</p>
+          <h2>Selected batch summary</h2>
+        </div>
+        <div class="section-note">Only appears when a batch is selected, so procurement readers can inspect provenance without losing the portfolio promise at the top.</div>
+      </div>
+      <div class="yield-summary" id="focusedBatchSummary">__SNAPSHOT_FOCUSED_BATCH_SUMMARY__</div>
+      <div class="production-grid" id="focusedBatchCards">__SNAPSHOT_FOCUSED_BATCH_CARDS__</div>
+    </article>
+
+    <article class="panel section stage-incubation">
+      <div class="section-head">
+        <div>
+          <p class="section-label">Layer 3 Credibility</p>
+          <h2>Prepared volume and baseline</h2>
+        </div>
+        <div class="section-note">Shows prepared bag volume against the standard batch baseline so buyers can see how much substrate is actually behind the promise.</div>
+      </div>
+      <div class="yield-summary" id="productionSummary">__SNAPSHOT_PRODUCTION_SUMMARY__</div>
+      <div class="production-grid" id="productionCards">__SNAPSHOT_PRODUCTION_CARDS__</div>
+    </article>
+
+    <article class="panel section stage-fruiting">
+      <div class="section-head">
+        <div>
+          <p class="section-label">Layer 3 Credibility</p>
+          <h2>Provenance and yield bridge</h2>
+        </div>
+        <div class="section-note">Connects incubation, fruiting, and harvest records so the shipping promise can be traced back to physical lots.</div>
+      </div>
+      <div class="yield-summary" id="yieldSummary">__SNAPSHOT_YIELD_SUMMARY__</div>
+      <div class="yield-grid" id="yieldBridge">__SNAPSHOT_YIELD_BRIDGE__</div>
+    </article>
+
+    <article class="panel section stage-incubation">
+      <div class="section-head">
+        <div>
+          <p class="section-label">Layer 3 Credibility</p>
+          <h2>Vendor performance snapshot detail</h2>
+        </div>
+        <div class="section-note">Keeps vendor-level loss and alert detail below the promise strip, where it supports confidence instead of dominating the story.</div>
+      </div>
+      <div class="yield-summary" id="vendorSummary">__SNAPSHOT_VENDOR_SUMMARY__</div>
+      <div class="production-grid" id="vendorCards">__SNAPSHOT_VENDOR_CARDS__</div>
+    </article>
+
+    <section class="grid layout">
+      <div class="grid">
+        <article class="panel section stage-incubation">
+          <div class="section-head">
+            <div>
+              <p class="section-label">Layer 3 Validation</p>
+              <h2>Batch flow timeline</h2>
+            </div>
+            <div class="section-note">Batch-level monitoring evidence for internal validation. This stays below the buyer strip because it proves control rather than defining the promise.</div>
+          </div>
+          <div class="chart-legend">
+            <span class="chart-legend-item"><span class="chart-dot" style="color: var(--slow)"></span> Slow growth check</span>
+            <span class="chart-legend-item"><span class="chart-dot" style="color: var(--moderate)"></span> Moderate growth check</span>
+            <span class="chart-legend-item"><span class="chart-dot" style="color: var(--good)"></span> Good growth check</span>
+            <span class="chart-legend-item"><span class="chart-dot ring-risk"></span> Visual alert</span>
+            <span class="chart-legend-item"><span class="chart-dot ring-warn"></span> Smell alert</span>
+            <span class="chart-legend-item"><span class="chart-dot dual-alert"></span> Visual alert + smell</span>
+          </div>
+          <div class="chart-frame" id="timeline">__SNAPSHOT_TIMELINE__</div>
+        </article>
+
+        <article class="panel section stage-incubation">
+          <div class="section-head">
+            <div>
+              <p class="section-label">Layer 3 Detail</p>
+              <h2>Bag removals over time</h2>
+            </div>
+            <div class="section-note">Removal spikes stay visible as supporting risk evidence, but they no longer lead the page.</div>
+          </div>
+          <div class="chart-frame" id="removals">__SNAPSHOT_REMOVALS__</div>
+        </article>
+
+        <article class="panel section stage-harvest">
+          <div class="section-head">
+            <div>
+              <p class="section-label">Layer 3 Detail</p>
+              <h2>Daily harvest</h2>
+            </div>
+            <div class="section-note">Daily harvest detail underpins the ATP math shown at the top.</div>
+          </div>
+          <div class="yield-summary" id="harvestSummary"></div>
+          <div class="chart-frame" id="dailyHarvest">__SNAPSHOT_DAILY_HARVEST__</div>
+        </article>
+      </div>
+
+      <div class="grid">
+        <article class="panel section stage-incubation">
+          <div class="section-head">
+            <div>
+              <p class="section-label">Layer 3 Detail</p>
+              <h2>Latest batch status</h2>
+            </div>
+            <div class="section-note">Current batch-by-batch view for validation and farm follow-up.</div>
+          </div>
+          <div class="batch-cards" id="batchCards">__SNAPSHOT_BATCH_CARDS__</div>
+        </article>
+
+        <article class="panel section stage-contamination">
+          <div class="section-head">
+            <div>
+              <p class="section-label">Layer 3 Detail</p>
+              <h2>Exception log</h2>
+            </div>
+            <div class="section-note">Raw exceptions remain available for credibility, but they no longer set the story on the first screen.</div>
+          </div>
+          <div class="events" id="events">__SNAPSHOT_EVENTS__</div>
+        </article>
+      </div>
+    </section>
+
+    <p class="footer">__SNAPSHOT_FOOTER__</p>
+  </div>
+
+  <div class="chart-tooltip" id="chartTooltip"></div>
+
+  <script id="opsdashSnapshotMeta" type="application/json">__SNAPSHOT_META_JSON__</script>
+  <script src="./data.js"></script>
+  <script>
+    const VALID_PUBLIC_PASSWORDS = new Set(["zucchini", "cilantro", "citypark", "galleria"]);
+    const ACCESS_STORAGE_KEY = "opsdash-public-access-v3";
+
+    const accessFormEl = document.getElementById("accessForm");
+    const accessPasswordEl = document.getElementById("accessPassword");
+    const accessErrorEl = document.getElementById("accessError");
+
+    function unlockDashboard() {
+      window.localStorage.setItem(ACCESS_STORAGE_KEY, "granted");
+      document.body.classList.remove("gate-locked");
+      accessErrorEl.textContent = "";
+      accessPasswordEl.value = "";
+    }
+
+    function checkPassword(value) {
+      return VALID_PUBLIC_PASSWORDS.has(String(value || "").trim().toLowerCase());
+    }
+
+    if (window.localStorage.getItem(ACCESS_STORAGE_KEY) === "granted") {
+      unlockDashboard();
+    } else {
+      accessPasswordEl.focus();
+    }
+
+    accessFormEl.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (checkPassword(accessPasswordEl.value)) {
+        unlockDashboard();
+        return;
+      }
+      accessErrorEl.textContent = "Incorrect password. Please try again.";
+      accessPasswordEl.select();
+    });
+
+    const snapshotMetaScriptEl = document.getElementById("opsdashSnapshotMeta");
+    const publicSnapshotMeta = snapshotMetaScriptEl ? JSON.parse(snapshotMetaScriptEl.textContent) : {};
+
+    function normalizeFruitingLotId(value) {
+      return String(value || "").replace(/^FR-(\d{2})-(\d{2}\/\d{2}\/\d{2}-\d{2})$/, "FR-$1/$2");
+    }
+
+    function hasMeaningfulText(value) {
+      const text = String(value || "").trim();
+      return Boolean(text && text !== "-" && text !== "\"");
+    }
+
+    const dashboardContext = window.DASHBOARD_CONTEXT || { bagging: [], pasteurization: [], incubation: window.DASHBOARD_DATA || [], fruiting: [], harvest: [] };
+    const allRows = [...dashboardContext.incubation].sort((a, b) => {
+      if (a.date !== b.date) return a.date.localeCompare(b.date);
+      return a.day - b.day;
+    });
+    const baggingRows = [...(dashboardContext.bagging || [])];
+    const pasteurizationRows = [...(dashboardContext.pasteurization || [])];
+    const fruitingRows = [...(dashboardContext.fruiting || [])].map((row) => ({
+      ...row,
+      fruitingLot: normalizeFruitingLotId(row.fruitingLot),
+    }));
+    const harvestRows = [...(dashboardContext.harvest || [])].map((row) => ({
+      ...row,
+      fruitingLot: normalizeFruitingLotId(row.fruitingLot),
+    }));
+
+    const growthValue = { Poor: 0.6, Slow: 1, Moderate: 2, Good: 3 };
+    const growthClass = { Poor: "slow", Slow: "slow", Moderate: "moderate", Good: "good" };
+    const growthColor = { Poor: "#a12d1e", Slow: "#d56a3b", Moderate: "#d2a13b", Good: "#2f7d4a" };
+    const batchIdPattern = /^(SB-\d{4}\/\d{2}\/\d{2}-\d{2})(?:-([A-Z]{2,3}))?$/;
+    const fmtDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" });
+    const fmtDateTimeNairobi = new Intl.DateTimeFormat("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+      timeZone: "Africa/Nairobi",
+    });
+    const fmtDateTimeEst = new Intl.DateTimeFormat("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+      timeZone: "America/New_York",
+    });
+    const AUTO_REFRESH_INTERVAL_MINUTES = 15;
+    const REFRESH_WARNING_MINUTES = AUTO_REFRESH_INTERVAL_MINUTES * 3;
+    const REFRESH_ALERT_MINUTES = AUTO_REFRESH_INTERVAL_MINUTES * 6;
+    const dashboardGeneratedAt = dashboardContext.generatedAt ? new Date(dashboardContext.generatedAt) : null;
+
+    const filterEl = document.getElementById("batchFilter");
+    const focusStatusEl = document.getElementById("focusStatus");
+    const heroMetaEl = document.getElementById("hero-meta");
+    const kpisEl = document.getElementById("kpis");
+    const consistencyPanelEl = document.getElementById("consistencyPanel");
+    const pipelinePanelEl = document.getElementById("pipelinePanel");
+    const riskPanelEl = document.getElementById("riskPanel");
+    const vendorStabilityPanelEl = document.getElementById("vendorStabilityPanel");
+    const focusedBatchPanelEl = document.getElementById("focusedBatchPanel");
+    const focusedBatchSummaryEl = document.getElementById("focusedBatchSummary");
+    const focusedBatchCardsEl = document.getElementById("focusedBatchCards");
+    const productionSummaryEl = document.getElementById("productionSummary");
+    const productionCardsEl = document.getElementById("productionCards");
+    const vendorSummaryEl = document.getElementById("vendorSummary");
+    const vendorCardsEl = document.getElementById("vendorCards");
+    const timelineEl = document.getElementById("timeline");
+    const removalsEl = document.getElementById("removals");
+    const dailyHarvestEl = document.getElementById("dailyHarvest");
+    const harvestSummaryEl = document.getElementById("harvestSummary");
+    const batchCardsEl = document.getElementById("batchCards");
+    const eventsEl = document.getElementById("events");
+    const yieldSummaryEl = document.getElementById("yieldSummary");
+    const yieldBridgeEl = document.getElementById("yieldBridge");
+    const chartTooltipEl = document.getElementById("chartTooltip");
+
+    const batchNames = [...new Set(allRows.map((row) => row.batchNorm))];
+    const options = [{ value: "all", label: "All batches" }, ...batchNames.map((batch) => ({ value: batch, label: batch }))];
+    filterEl.innerHTML = options.map((option) => `<option value="${option.value}">${option.label}</option>`).join("");
+    if (publicSnapshotMeta.selected_batch && [...filterEl.options].some((option) => option.value === publicSnapshotMeta.selected_batch)) {
+      filterEl.value = publicSnapshotMeta.selected_batch;
+    } else {
+      filterEl.value = "all";
+    }
+
+    filterEl.addEventListener("change", render);
+
+    function setBatchScope(value, scrollTarget = true) {
+      if (![...filterEl.options].some((option) => option.value === value)) {
+        return;
+      }
+      filterEl.value = value;
+      render();
+      if (scrollTarget) {
+        timelineEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function renderFocusStatus() {
+      const refreshHealth = getRefreshHealth();
+      const value = filterEl.value || "all";
+      if (value === "all") {
+        focusStatusEl.innerHTML = `
+          <span class="focus-chip muted">Portfolio promise: all batches</span>
+          <span class="focus-chip ${refreshHealth.chipClass}">${refreshHealth.focusText}</span>
+        `;
+        return;
+      }
+      const orderedBatches = byBatch(allRows).map((entry) => entry.batch);
+      const currentIndex = orderedBatches.indexOf(value);
+      const previousBatch = currentIndex > 0 ? orderedBatches[currentIndex - 1] : null;
+      const nextBatch = currentIndex >= 0 && currentIndex < orderedBatches.length - 1 ? orderedBatches[currentIndex + 1] : null;
+      const focused = getFocusedBatchContext();
+      const relatedBatches = focused
+        ? [...new Set(allRows
+            .filter((row) => (row.baseBatch || row.batchNorm) === focused.baseBatch)
+            .map((row) => row.batchNorm))]
+            .sort((left, right) => left.localeCompare(right))
+            .filter((batch) => batch !== value)
+        : [];
+      focusStatusEl.innerHTML = `
+        <span class="focus-chip">Drill-down batch: ${value}</span>
+        <span class="focus-chip muted">Top promise strip stays portfolio-wide</span>
+        <span class="focus-chip ${refreshHealth.chipClass}">${refreshHealth.focusText}</span>
+        ${previousBatch ? `<button type="button" class="focus-nav" id="focusPrev">Previous batch</button>` : ""}
+        ${nextBatch ? `<button type="button" class="focus-nav" id="focusNext">Next batch</button>` : ""}
+        <button type="button" class="focus-reset" id="focusReset">Clear focus</button>
+        ${relatedBatches.length ? `<div class="focus-related">${relatedBatches.map((batch) => `<button type="button" class="focus-related-chip" data-related-batch="${escapeAttr(batch)}">${batch}</button>`).join("")}</div>` : ""}
+      `;
+      const previousButton = document.getElementById("focusPrev");
+      if (previousButton && previousBatch) {
+        previousButton.addEventListener("click", () => setBatchScope(previousBatch, false));
+      }
+      const nextButton = document.getElementById("focusNext");
+      if (nextButton && nextBatch) {
+        nextButton.addEventListener("click", () => setBatchScope(nextBatch, false));
+      }
+      const resetButton = document.getElementById("focusReset");
+      if (resetButton) {
+        resetButton.addEventListener("click", () => setBatchScope("all", false));
+      }
+      focusStatusEl.querySelectorAll("[data-related-batch]").forEach((button) => {
+        const batch = button.getAttribute("data-related-batch");
+        button.addEventListener("click", () => setBatchScope(batch, false));
+      });
+    }
+
+    function focusButton(label, batch) {
+      return `<button type="button" class="focus-link" data-batch-focus="${escapeAttr(batch)}">Focus ${label}</button>`;
+    }
+
+    function bindBatchFocusLinks(container) {
+      if (!container) {
+        return;
+      }
+      container.querySelectorAll("[data-batch-focus]").forEach((node) => {
+        if (node.dataset.focusBound === "true") {
+          return;
+        }
+        const batch = node.getAttribute("data-batch-focus");
+        const activate = () => setBatchScope(batch);
+        node.addEventListener("click", activate);
+        node.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            activate();
+          }
+        });
+        node.dataset.focusBound = "true";
+      });
+    }
+
+    function escapeAttr(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function showChartTooltip(text, clientX, clientY) {
+      if (!text) return;
+      chartTooltipEl.textContent = text;
+      chartTooltipEl.classList.add("visible");
+      const offset = 16;
+      const rect = chartTooltipEl.getBoundingClientRect();
+      const maxX = window.innerWidth - rect.width - 12;
+      const maxY = window.innerHeight - rect.height - 12;
+      const left = Math.max(12, Math.min(clientX + offset, maxX));
+      const top = Math.max(12, Math.min(clientY + offset, maxY));
+      chartTooltipEl.style.left = `${left}px`;
+      chartTooltipEl.style.top = `${top}px`;
+    }
+
+    function hideChartTooltip() {
+      chartTooltipEl.classList.remove("visible");
+    }
+
+    function parseIsoDate(value) {
+      return value ? new Date(`${value}T12:00:00Z`) : null;
+    }
+
+    function formatIsoDate(value) {
+      const parsed = parseIsoDate(value);
+      return parsed ? fmtDate.format(parsed) : "N/A";
+    }
+
+    function isoMonth(value) {
+      return String(value || "").trim().slice(0, 7);
+    }
+
+    function startOfWeekIso(value) {
+      const parsed = parseIsoDate(value);
+      if (!parsed) return "";
+      const offset = (parsed.getUTCDay() + 6) % 7;
+      parsed.setUTCDate(parsed.getUTCDate() - offset);
+      return parsed.toISOString().slice(0, 10);
+    }
+
+    function formatMonthLabel(value) {
+      if (!value) return "N/A";
+      const parsed = parseIsoDate(`${value}-01`);
+      return parsed ? new Intl.DateTimeFormat("en-GB", { month: "short", year: "numeric" }).format(parsed) : value;
+    }
+
+    function summarizeHarvest(daily) {
+      const totalHarvestedKg = daily.reduce((sum, entry) => sum + entry.harvestedKg, 0);
+      const totalRejectedKg = daily.reduce((sum, entry) => sum + entry.rejectedKg, 0);
+      const latestDate = daily[daily.length - 1]?.date || "";
+
+      const weeklyMap = new Map();
+      daily.forEach((entry) => {
+        const week = startOfWeekIso(entry.date);
+        const current = weeklyMap.get(week) || { harvestedKg: 0, rejectedKg: 0 };
+        current.harvestedKg += entry.harvestedKg;
+        current.rejectedKg += entry.rejectedKg;
+        weeklyMap.set(week, current);
+      });
+      const weekly = [...weeklyMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+      const currentWeek = weekly[weekly.length - 1];
+      const previousWeek = weekly[weekly.length - 2];
+      const weeklyDelta = currentWeek && previousWeek ? currentWeek[1].harvestedKg - previousWeek[1].harvestedKg : 0;
+
+      const monthlyMap = new Map();
+      daily.forEach((entry) => {
+        const month = isoMonth(entry.date);
+        const current = monthlyMap.get(month) || { harvestedKg: 0, rejectedKg: 0 };
+        current.harvestedKg += entry.harvestedKg;
+        current.rejectedKg += entry.rejectedKg;
+        monthlyMap.set(month, current);
+      });
+      const monthly = [...monthlyMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+      const currentMonth = monthly[monthly.length - 1];
+      const previousMonth = monthly[monthly.length - 2];
+      const monthDelta = currentMonth && previousMonth ? currentMonth[1].harvestedKg - previousMonth[1].harvestedKg : 0;
+      const currentMonthEntries = currentMonth
+        ? daily.filter((entry) => isoMonth(entry.date) === currentMonth[0])
+        : [];
+      const currentMonthDailyAverage = currentMonthEntries.length
+        ? currentMonth[1].harvestedKg / currentMonthEntries.length
+        : 0;
+      const trendWindow = daily.slice(-7);
+      const priorTrendWindow = daily.slice(-14, -7);
+      const trendCurrentTotal = trendWindow.reduce((sum, entry) => sum + entry.harvestedKg, 0);
+      const trendPreviousTotal = priorTrendWindow.reduce((sum, entry) => sum + entry.harvestedKg, 0);
+      const trendDelta = priorTrendWindow.length ? trendCurrentTotal - trendPreviousTotal : 0;
+      const trendPercent = priorTrendWindow.length
+        ? (trendPreviousTotal ? (trendDelta / trendPreviousTotal) * 100 : trendCurrentTotal > 0 ? 100 : 0)
+        : 0;
+      const trendCurrentRange = trendWindow.length ? `${formatIsoDate(trendWindow[0].date)} to ${formatIsoDate(trendWindow[trendWindow.length - 1].date)}` : "";
+      const trendPreviousRange = priorTrendWindow.length ? `${formatIsoDate(priorTrendWindow[0].date)} to ${formatIsoDate(priorTrendWindow[priorTrendWindow.length - 1].date)}` : "";
+
+      return [
+        {
+          value: `${totalHarvestedKg.toFixed(2)} kg`,
+          label: "Total recorded harvest",
+          note: totalRejectedKg ? `${totalRejectedKg.toFixed(2)} kg rejected across the visible range.` : latestDate ? `Latest harvest logged ${formatIsoDate(latestDate)}.` : "",
+          tone: "stage-harvest",
+        },
+        {
+          value: currentWeek ? `${currentWeek[1].harvestedKg.toFixed(2)} kg` : "0.00 kg",
+          label: currentWeek ? `Calendar week starting ${formatIsoDate(currentWeek[0])}` : "Current calendar week total",
+          note: currentWeek
+            ? previousWeek
+              ? `${formatIsoDate(currentWeek[0])} week start | Previous week: ${previousWeek[1].harvestedKg.toFixed(2)} kg | ${weeklyDelta >= 0 ? "+" : ""}${weeklyDelta.toFixed(2)} kg vs previous week.`
+              : `${formatIsoDate(currentWeek[0])} week start | No previous week to compare.`
+            : "No weekly harvest yet.",
+          tone: "stage-harvest",
+        },
+        {
+          value: trendWindow.length ? `${trendDelta >= 0 ? "+" : ""}${trendDelta.toFixed(2)} kg` : "0.00 kg",
+          label: trendCurrentRange ? `Rolling 7-day trend (${trendCurrentRange})` : "Rolling 7-day trend",
+          note: priorTrendWindow.length
+            ? `Previous 7 days (${trendPreviousRange}): ${trendPreviousTotal.toFixed(2)} kg | ${trendPercent >= 0 ? "+" : ""}${trendPercent.toFixed(1)}% vs prior window.`
+            : "Need at least two 7-day windows for a full trend comparison.",
+          tone: trendDelta >= 0 ? "stage-fruiting" : "stage-contamination",
+        },
+        {
+          value: currentMonth ? `${currentMonth[1].harvestedKg.toFixed(2)} kg` : "0.00 kg",
+          label: currentMonth ? `${formatMonthLabel(currentMonth[0])} total` : "Current month total",
+          note: currentMonth
+            ? `${currentMonthDailyAverage.toFixed(2)} kg/day average${previousMonth ? ` | ${monthDelta >= 0 ? "+" : ""}${monthDelta.toFixed(2)} kg vs ${formatMonthLabel(previousMonth[0])}.` : " | No previous month to compare."}`
+            : "No previous month available yet.",
+          tone: "stage-harvest",
+        },
+      ];
+    }
+
+    function batchSortMeta(batch, entries) {
+      const sample = entries[0] || {};
+      const match = batch.match(batchIdPattern);
+      return {
+        baseBatch: sample.baseBatch || (match ? match[1] : batch),
+        vendor: sample.vendor || (match ? (match[2] || "") : ""),
+        firstDate: entries.map((row) => row.date).filter(Boolean).sort()[0] || "",
+        firstDay: Math.min(...entries.map((row) => row.day || 0)),
+      };
+    }
+
+    function bindChartTooltips() {
+      document.querySelectorAll(".chart-interactive[data-tooltip]").forEach((node) => {
+        node.addEventListener("mousemove", (event) => {
+          showChartTooltip(node.dataset.tooltip, event.clientX, event.clientY);
+        });
+        node.addEventListener("mouseenter", (event) => {
+          showChartTooltip(node.dataset.tooltip, event.clientX, event.clientY);
+        });
+        node.addEventListener("mouseleave", hideChartTooltip);
+        node.addEventListener("click", (event) => {
+          event.preventDefault();
+          showChartTooltip(node.dataset.tooltip, event.clientX, event.clientY);
+        });
+        node.addEventListener("touchstart", (event) => {
+          const touch = event.touches[0];
+          if (touch) {
+            showChartTooltip(node.dataset.tooltip, touch.clientX, touch.clientY);
+          }
+        }, { passive: true });
+      });
+    }
+
+    function getRows() {
+      const value = filterEl.value;
+      return value === "all" ? allRows : allRows.filter((row) => row.batchNorm === value);
+    }
+
+    function getFocusedBatchContext() {
+      const batch = filterEl.value;
+      if (!batch || batch === "all") {
+        return null;
+      }
+      const sample = allRows.find((row) => row.batchNorm === batch);
+      return {
+        batch,
+        baseBatch: sample?.baseBatch || batch,
+        vendor: sample?.vendor || "",
+      };
+    }
+
+    function byBatch(rows) {
+      return [...rows.reduce((map, row) => {
+        if (!map.has(row.batchNorm)) map.set(row.batchNorm, []);
+        map.get(row.batchNorm).push(row);
+        return map;
+      }, new Map()).entries()].map(([batch, entries]) => ({
+        batch,
+        rows: entries.sort((a, b) => a.day - b.day || a.date.localeCompare(b.date))
+      })).sort((a, b) => {
+        const left = batchSortMeta(a.batch, a.rows);
+        const right = batchSortMeta(b.batch, b.rows);
+        return left.firstDate.localeCompare(right.firstDate)
+          || left.baseBatch.localeCompare(right.baseBatch)
+          || left.vendor.localeCompare(right.vendor)
+          || left.firstDay - right.firstDay
+          || a.batch.localeCompare(b.batch);
+      });
+    }
+
+    function latestPerBatch(rows) {
+      return byBatch(rows).map(({ batch, rows: entries }) => ({
+        batch,
+        latest: entries[entries.length - 1],
+        rows: entries
+      }));
+    }
+
+    function formatAgeMinutes(totalMinutes) {
+      if (totalMinutes <= 0) {
+        return "just now";
+      }
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      if (hours && minutes) {
+        return `${hours}h ${minutes}m`;
+      }
+      if (hours) {
+        return `${hours}h`;
+      }
+      return `${minutes}m`;
+    }
+
+    function getRefreshHealth(now = new Date()) {
+      if (!(dashboardGeneratedAt instanceof Date) || Number.isNaN(dashboardGeneratedAt.getTime())) {
+        return {
+          chipClass: "warning",
+          tagClass: "warning",
+          focusText: "Refresh status unknown",
+          heroText: "Refresh timestamp unavailable",
+        };
+      }
+
+      const ageMinutes = Math.max(0, Math.round((now.getTime() - dashboardGeneratedAt.getTime()) / 60000));
+      if (ageMinutes >= REFRESH_ALERT_MINUTES) {
+        const label = formatAgeMinutes(ageMinutes);
+        return {
+          chipClass: "alert",
+          tagClass: "alert",
+          focusText: `Refresh overdue: ${label}`,
+          heroText: `Refresh overdue by ${label}`,
+        };
+      }
+      if (ageMinutes >= REFRESH_WARNING_MINUTES) {
+        const label = formatAgeMinutes(ageMinutes);
+        return {
+          chipClass: "warning",
+          tagClass: "warning",
+          focusText: `Refresh delayed: ${label}`,
+          heroText: `Refresh delayed by ${label}`,
+        };
+      }
+
+      const label = formatAgeMinutes(ageMinutes);
+      return {
+        chipClass: "",
+        tagClass: "",
+        focusText: ageMinutes <= 0 ? "Updated just now" : `Updated ${label} ago`,
+        heroText: ageMinutes <= 0 ? "Refresh age: just now" : `Refresh age ${label}`,
+      };
+    }
+
+    function formatKg(value) {
+      return `${Math.max(0, value).toFixed(1)} kg`;
+    }
+
+    function formatPct(value) {
+      return `${Math.max(0, value).toFixed(1)}%`;
+    }
+
+    function mean(values) {
+      return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+    }
+
+    function standardDeviation(values) {
+      if (!values.length) {
+        return 0;
+      }
+      const avg = mean(values);
+      return Math.sqrt(values.reduce((sum, value) => sum + ((value - avg) ** 2), 0) / values.length);
+    }
+
+    function clipSentence(value, fallback = "No current issue note.") {
+      const text = String(value || "").trim();
+      if (!hasMeaningfulText(text)) {
+        return fallback;
+      }
+      return text
+        .split(/(?<=[.!?])\s+/)[0]
+        .replace(/^"+|"+$/g, "")
+        .trim();
+    }
+
+    function decisionInlineMetric(value, label) {
+      return `
+        <div class="decision-inline-card">
+          <div class="decision-inline-value">${value}</div>
+          <div class="decision-inline-label">${label}</div>
+        </div>
+      `;
+    }
+
+    function decisionPanelMarkup(highlightValue, highlightLabel, metrics, bullets) {
+      return `
+        <div class="decision-highlight">
+          <div class="decision-highlight-value">${highlightValue}</div>
+          <div class="decision-highlight-label">${highlightLabel}</div>
+        </div>
+        <div class="decision-inline-metrics">
+          ${metrics.join("")}
+        </div>
+        <div class="decision-list">
+          ${bullets.map((item) => `<div class="decision-list-item">${item}</div>`).join("")}
+        </div>
+      `;
+    }
+
+    function buildReliabilityModel() {
+      const productionPairs = getProductionPairs();
+      const productionByBaseBatch = new Map(productionPairs.map((entry) => [entry.row.batchNorm, entry.actualBags]));
+      const latestVariants = latestPerBatch(allRows).map((entry) => entry.latest);
+      const baseContexts = new Map();
+      const fruitingLatestByLot = new Map();
+      const harvestByLot = new Map();
+
+      function ensureBaseContext(baseBatch) {
+        if (!baseContexts.has(baseBatch)) {
+          baseContexts.set(baseBatch, {
+            baseBatch,
+            latestDate: "",
+            latestDay: 0,
+            latestGrowth: "Unknown",
+            latestSmell: false,
+            latestContam: false,
+            vendors: new Set(),
+            latestVariants: [],
+            loggedBags: 0,
+            preparedBags: 0,
+            totalRemoved: 0,
+            totalAlerts: 0,
+            fruitingLots: new Set(),
+          });
+        }
+        return baseContexts.get(baseBatch);
+      }
+
+      allRows.forEach((row) => {
+        const context = ensureBaseContext(row.baseBatch || row.batchNorm);
+        context.totalRemoved += row.removed || 0;
+        context.totalAlerts += Number(Boolean(row.contamination)) + Number(Boolean(row.smell));
+        if ((row.date || "") > context.latestDate || (row.date === context.latestDate && (row.day || 0) >= context.latestDay)) {
+          context.latestDate = row.date || context.latestDate;
+          context.latestDay = row.day || context.latestDay;
+          context.latestGrowth = row.growth || context.latestGrowth;
+          context.latestSmell = Boolean(row.smell);
+          context.latestContam = Boolean(row.contamination);
+        }
+      });
+
+      latestVariants.forEach((row) => {
+        const context = ensureBaseContext(row.baseBatch || row.batchNorm);
+        context.loggedBags += row.bagCount || 0;
+        context.latestVariants.push(row);
+        if (row.vendor) {
+          context.vendors.add(row.vendor);
+        }
+      });
+
+      fruitingRows.forEach((row) => {
+        const lotId = normalizeFruitingLotId(row.fruitingLot);
+        const existing = fruitingLatestByLot.get(lotId);
+        if (!existing || row.date > existing.date) {
+          fruitingLatestByLot.set(lotId, { ...row, fruitingLot: lotId });
+        }
+      });
+
+      harvestRows.forEach((row) => {
+        const lotId = normalizeFruitingLotId(row.fruitingLot);
+        if (!harvestByLot.has(lotId)) {
+          harvestByLot.set(lotId, []);
+        }
+        harvestByLot.get(lotId).push({ ...row, fruitingLot: lotId });
+      });
+
+      fruitingLatestByLot.forEach((row, lotId) => {
+        row.sourceBatchIds.forEach((baseBatch) => {
+          ensureBaseContext(baseBatch).fruitingLots.add(lotId);
+        });
+      });
+
+      baseContexts.forEach((context, baseBatch) => {
+        context.preparedBags = productionByBaseBatch.get(baseBatch) || context.loggedBags;
+      });
+
+      const latestHarvestDateText = harvestRows.map((row) => row.date).filter(Boolean).sort().slice(-1)[0] || "";
+      const latestHarvestDate = latestHarvestDateText ? parseIsoDate(latestHarvestDateText) : null;
+      const anchorDate = latestHarvestDate || (dashboardGeneratedAt instanceof Date && !Number.isNaN(dashboardGeneratedAt.getTime()) ? dashboardGeneratedAt : new Date());
+
+      const activeFruitingLots = [...fruitingLatestByLot.keys()].filter((lotId) => {
+        const harvestEntries = harvestByLot.get(lotId) || [];
+        const latestLotHarvest = harvestEntries.map((row) => row.date).filter(Boolean).sort().slice(-1)[0];
+        const latestSignalText = latestLotHarvest || fruitingLatestByLot.get(lotId)?.date || "";
+        if (!latestSignalText) {
+          return false;
+        }
+        const latestSignalDate = parseIsoDate(latestSignalText);
+        return ((anchorDate.getTime() - latestSignalDate.getTime()) / 86400000) <= 7;
+      });
+
+      const harvestedBaseBatches = new Set();
+      fruitingLatestByLot.forEach((row, lotId) => {
+        if ((harvestByLot.get(lotId) || []).length) {
+          row.sourceBatchIds.forEach((baseBatch) => harvestedBaseBatches.add(baseBatch));
+        }
+      });
+
+      const totalHarvestedKg = harvestRows.reduce((sum, row) => sum + (row.quantityHarvestedKg || 0), 0);
+      const linkedPreparedBags = [...harvestedBaseBatches].reduce((sum, baseBatch) => sum + (baseContexts.get(baseBatch)?.preparedBags || 0), 0);
+      const kgPerPreparedBag = linkedPreparedBags ? (totalHarvestedKg / linkedPreparedBags) : 0.205;
+
+      const recentHarvestRows7 = latestHarvestDate
+        ? harvestRows.filter((row) => ((latestHarvestDate.getTime() - parseIsoDate(row.date).getTime()) / 86400000) <= 6)
+        : [];
+      const recentHarvestRows14 = latestHarvestDate
+        ? harvestRows.filter((row) => ((latestHarvestDate.getTime() - parseIsoDate(row.date).getTime()) / 86400000) <= 13)
+        : [];
+      const recentHarvest7Kg = recentHarvestRows7.reduce((sum, row) => sum + (row.quantityHarvestedKg || 0), 0);
+      const recentHarvest14Kg = recentHarvestRows14.reduce((sum, row) => sum + (row.quantityHarvestedKg || 0), 0);
+      const recentRejected14Kg = recentHarvestRows14.reduce((sum, row) => sum + (row.quantityRejectedKg || 0), 0);
+      const recentAccepted14Kg = Math.max(recentHarvest14Kg - recentRejected14Kg, 0);
+      const acceptanceRate = recentHarvest14Kg ? (recentAccepted14Kg / recentHarvest14Kg) * 100 : 0;
+      const rejectionRate = recentHarvest14Kg ? (recentRejected14Kg / recentHarvest14Kg) * 100 : 0;
+
+      const dailyHarvestMap = harvestRows.reduce((map, row) => {
+        if (!map.has(row.date)) {
+          map.set(row.date, { date: row.date, harvestedKg: 0, rejectedKg: 0 });
+        }
+        const entry = map.get(row.date);
+        entry.harvestedKg += row.quantityHarvestedKg || 0;
+        entry.rejectedKg += row.quantityRejectedKg || 0;
+        return map;
+      }, new Map());
+      const dailyHarvest = [...dailyHarvestMap.values()].sort((left, right) => left.date.localeCompare(right.date));
+      const recentDaily7 = dailyHarvest.slice(-7);
+      const recentDaily14 = dailyHarvest.slice(-14);
+      const recent7Values = recentDaily7.map((entry) => entry.harvestedKg);
+      const averageDaily7 = mean(recent7Values);
+      const deviationDaily7 = standardDeviation(recent7Values);
+      const volatility7 = averageDaily7 ? deviationDaily7 / averageDaily7 : 0;
+      const consistencyLabel = volatility7 <= 0.18 ? "Stable" : volatility7 <= 0.32 ? "Watch" : "Volatile";
+      const consistencyTone = volatility7 <= 0.18 ? "stage-harvest" : volatility7 <= 0.32 ? "stage-fruiting" : "stage-contamination";
+
+      const baseEntries = [...baseContexts.values()].map((context) => ({
+        ...context,
+        vendorList: [...context.vendors].sort(),
+        fruitingLotList: [...context.fruitingLots].sort(),
+      }));
+      const excludedEntries = baseEntries.filter((context) => context.preparedBags && context.totalRemoved >= Math.max(context.preparedBags * 0.9, context.loggedBags * 0.9));
+      const nearHarvestEntries = baseEntries.filter((context) => !context.fruitingLotList.length && context.latestDay >= 13 && !excludedEntries.some((entry) => entry.baseBatch === context.baseBatch));
+      const earlyPipelineEntries = baseEntries.filter((context) => !context.fruitingLotList.length && context.latestDay > 0 && context.latestDay < 13 && !excludedEntries.some((entry) => entry.baseBatch === context.baseBatch));
+      const fruitingBaseBatches = new Set();
+      activeFruitingLots.forEach((lotId) => {
+        (fruitingLatestByLot.get(lotId)?.sourceBatchIds || []).forEach((baseBatch) => fruitingBaseBatches.add(baseBatch));
+      });
+      const activeFruitingBags = [...fruitingBaseBatches].reduce((sum, baseBatch) => sum + (baseContexts.get(baseBatch)?.preparedBags || 0), 0);
+      const nearHarvestBags = nearHarvestEntries.reduce((sum, context) => sum + context.preparedBags, 0);
+      const earlyPipelineBags = earlyPipelineEntries.reduce((sum, context) => sum + context.preparedBags, 0);
+      const watchedNearHarvestBags = nearHarvestEntries
+        .filter((context) => context.latestSmell || context.latestContam)
+        .reduce((sum, context) => sum + context.preparedBags, 0);
+
+      const activeFruitingIssueRow = activeFruitingLots
+        .map((lotId) => fruitingLatestByLot.get(lotId))
+        .find((row) => hasMeaningfulText(row?.issuesObserved) || hasMeaningfulText(row?.actionTaken));
+      const openFlaggedBatchCount = baseEntries.filter((context) => !context.fruitingLotList.length && (context.latestSmell || context.latestContam)).length;
+      let serviceRiskScore = 0;
+      if (activeFruitingLots.length <= 1) {
+        serviceRiskScore += activeFruitingLots.length ? 2 : 1;
+      }
+      if (activeFruitingIssueRow) {
+        serviceRiskScore += 1;
+      }
+      if (watchedNearHarvestBags >= 150) {
+        serviceRiskScore += 1;
+      }
+      if (openFlaggedBatchCount >= 2) {
+        serviceRiskScore += 1;
+      }
+      if (rejectionRate > 2 || acceptanceRate < 98) {
+        serviceRiskScore += 1;
+      }
+
+      const serviceRisk = serviceRiskScore >= 4
+        ? { level: "High", tone: "stage-contamination", multiplier: 0.82 }
+        : serviceRiskScore >= 2
+          ? { level: "Med", tone: "stage-fruiting", multiplier: 0.90 }
+          : { level: "Low", tone: "stage-harvest", multiplier: 0.95 };
+      const issueMultiplier = activeFruitingIssueRow ? 0.92 : 1;
+
+      function stageRiskMultiplier(context) {
+        if (excludedEntries.some((entry) => entry.baseBatch === context.baseBatch)) {
+          return 0;
+        }
+        if (context.latestContam) {
+          return 0.55;
+        }
+        if (context.latestSmell) {
+          return 0.88;
+        }
+        return 0.95;
+      }
+
+      function next7Share(context) {
+        if (context.latestDay >= 17) {
+          return 0.15;
+        }
+        if (context.latestDay >= 15) {
+          return 0.05;
+        }
+        return 0;
+      }
+
+      function next14Share(context) {
+        if (context.latestDay >= 17) {
+          return 0.40;
+        }
+        if (context.latestDay >= 15) {
+          return 0.30;
+        }
+        if (context.latestDay >= 13) {
+          return 0.22;
+        }
+        return 0;
+      }
+
+      const nearHarvest7Kg = nearHarvestEntries.reduce((sum, context) => sum + (context.preparedBags * kgPerPreparedBag * next7Share(context) * stageRiskMultiplier(context)), 0);
+      const nearHarvest14Kg = nearHarvestEntries.reduce((sum, context) => sum + (context.preparedBags * kgPerPreparedBag * next14Share(context) * stageRiskMultiplier(context)), 0);
+      const available7Kg = (recentHarvest7Kg * serviceRisk.multiplier * issueMultiplier) + nearHarvest7Kg;
+      const available14Kg = (recentHarvest7Kg * 1.25 * serviceRisk.multiplier * issueMultiplier) + nearHarvest14Kg;
+      const weeklyMoqKg = Math.min(available7Kg, recentHarvest7Kg || available7Kg);
+
+      const riskFactors = [];
+      if (activeFruitingLots.length <= 1) {
+        riskFactors.push(`${activeFruitingLots.length || 0} live fruiting lot${activeFruitingLots.length === 1 ? "" : "s"} is carrying current shipment cadence.`);
+      }
+      if (watchedNearHarvestBags > 0) {
+        riskFactors.push(`${watchedNearHarvestBags} near-harvest bags are on smell or contamination watch before they can support the next promise window.`);
+      }
+      if (activeFruitingIssueRow) {
+        riskFactors.push(`Latest fruiting note on ${formatIsoDate(activeFruitingIssueRow.date)}: ${clipSentence(activeFruitingIssueRow.issuesObserved || activeFruitingIssueRow.actionTaken)}.`);
+      } else if (excludedEntries.length) {
+        riskFactors.push(`${excludedEntries.reduce((sum, entry) => sum + entry.preparedBags, 0)} prepared bags from failed batches are excluded from ATP rather than rolled forward.`);
+      }
+
+      const vendorExposure = new Map();
+      const watchedVendorExposure = new Map();
+      [...nearHarvestEntries, ...earlyPipelineEntries].forEach((context) => {
+        context.latestVariants.forEach((row) => {
+          const vendor = row.vendor || "Unknown";
+          vendorExposure.set(vendor, (vendorExposure.get(vendor) || 0) + (row.bagCount || 0));
+          if (row.smell || row.contamination) {
+            watchedVendorExposure.set(vendor, (watchedVendorExposure.get(vendor) || 0) + (row.bagCount || 0));
+          }
+        });
+      });
+      const vendorExposureList = [...vendorExposure.entries()].sort((left, right) => right[1] - left[1]);
+      const currentPromiseVendors = vendorExposureList.map(([vendor]) => vendor);
+      const topVendorExposure = vendorExposureList.slice(0, 2).reduce((sum, [, bags]) => sum + bags, 0);
+      const systemicVendorDriver = watchedVendorExposure.size >= 2
+        ? `Current watch flags cut across ${[...watchedVendorExposure.keys()].join(", ")}, which points to room conditions rather than a single-vendor miss.`
+        : currentPromiseVendors.length
+          ? `${currentPromiseVendors[0]} carries the largest share of open bags in the current promise window.`
+          : "No vendor-tagged open pipeline is available.";
+
+      const serviceRiskDriver = activeFruitingLots.length <= 1
+        ? `${serviceRisk.level} because one live fruiting lot is carrying current shipments while ${watchedNearHarvestBags} near-harvest bags remain on watch.`
+        : `${serviceRisk.level} because multiple active watch flags are still open in the near-harvest pipeline.`;
+
+      return {
+        available7Kg,
+        available14Kg,
+        weeklyMoqKg,
+        acceptanceRate,
+        rejectionRate,
+        recentAccepted14Kg,
+        recentRejected14Kg,
+        recentHarvest7Kg,
+        recentHarvest14Kg,
+        latestHarvestDateText,
+        kgPerPreparedBag,
+        serviceRisk,
+        serviceRiskDriver,
+        consistencyLabel,
+        consistencyTone,
+        averageDaily7,
+        deviationDaily7,
+        volatility7,
+        recentDaily7,
+        recentDaily14,
+        activeFruitingLots,
+        activeFruitingBags,
+        nearHarvestEntries,
+        nearHarvestBags,
+        earlyPipelineEntries,
+        earlyPipelineBags,
+        watchedNearHarvestBags,
+        excludedEntries,
+        riskFactors: riskFactors.slice(0, 3),
+        vendorExposureList,
+        watchedVendorExposure,
+        systemicVendorDriver,
+        topVendorExposure,
+      };
+    }
+
+    function buildHeroMeta() {
+      const refreshHealth = getRefreshHealth();
+      const model = buildReliabilityModel();
+      const refreshedAt = dashboardContext.generatedAt
+        ? `EAT ${fmtDateTimeNairobi.format(new Date(dashboardContext.generatedAt))} | ET ${fmtDateTimeEst.format(new Date(dashboardContext.generatedAt))}`
+        : "unknown";
+
+      heroMetaEl.innerHTML = [
+        `<span class="tag">Harvest through ${model.latestHarvestDateText ? formatIsoDate(model.latestHarvestDateText) : "N/A"}</span>`,
+        `<span class="tag ${refreshHealth.tagClass}">${refreshHealth.heroText}</span>`,
+        `<span class="tag">Snapshot ${refreshedAt}</span>`,
+      ].join("");
+    }
+
+    function buildKpis() {
+      const model = buildReliabilityModel();
+      const cards = [
+        {
+          label: "Available-to-promise kg (next 7 days)",
+          value: formatKg(model.available7Kg),
+          note: "Risk-adjusted from the live fruiting run-rate, with only day-17+ pipeline pulled forward.",
+          tone: "stage-harvest",
+        },
+        {
+          label: "Available-to-promise kg (next 14 days)",
+          value: formatKg(model.available14Kg),
+          note: `Adds a conservative share of day-13+ pipeline at ${(model.kgPerPreparedBag * 100).toFixed(1)} kg per 100 prepared bags.`,
+          tone: "stage-fruiting",
+        },
+        {
+          label: "Minimum Reliable Weekly MOQ",
+          value: formatKg(model.weeklyMoqKg),
+          note: "Set as the lower of recent shipped week and current next-7 ATP.",
+          tone: "stage-incubation",
+        },
+        {
+          label: "Acceptance quality rate / rejection rate (recent)",
+          value: `${formatPct(model.acceptanceRate)} / ${formatPct(model.rejectionRate)}`,
+          note: `${formatKg(model.recentAccepted14Kg)} accepted in the last 14 days | ${formatKg(model.recentRejected14Kg)} rejected.`,
+          tone: model.rejectionRate > 2 ? "stage-contamination" : "stage-harvest",
+        },
+        {
+          label: "Service-risk flag",
+          value: model.serviceRisk.level,
+          note: model.serviceRiskDriver,
+          tone: model.serviceRisk.tone,
+        },
+      ];
+
+      kpisEl.innerHTML = cards.map((card) => `
+        <article class="panel kpi ${card.tone}">
+          <p class="section-label">${card.label}</p>
+          <div class="kpi-value">${card.value}</div>
+          <div class="kpi-note">${card.note}</div>
+        </article>
+      `).join("");
+    }
+
+    function buildDecisionPanels() {
+      const model = buildReliabilityModel();
+      const excludedBags = model.excludedEntries.reduce((sum, context) => sum + context.preparedBags, 0);
+      const topRiskBullets = model.riskFactors.length ? model.riskFactors : ["No open risk factor is currently stronger than the baseline service assumptions."];
+      const leadVendor = model.vendorExposureList[0] || ["N/A", 0];
+      const secondVendor = model.vendorExposureList[1] || ["N/A", 0];
+      const currentVendorTotal = model.vendorExposureList.reduce((sum, [, bags]) => sum + bags, 0);
+      const topVendorShare = currentVendorTotal ? (model.topVendorExposure / currentVendorTotal) * 100 : 0;
+      const recentDaily7Values = model.recentDaily7.map((entry) => entry.harvestedKg);
+      const recentDailyLow = recentDaily7Values.length ? Math.min(...recentDaily7Values) : 0;
+      const recentDailyHigh = recentDaily7Values.length ? Math.max(...recentDaily7Values) : 0;
+
+      consistencyPanelEl.innerHTML = decisionPanelMarkup(
+        model.consistencyLabel,
+        "Recent harvest cadence",
+        [
+          decisionInlineMetric(formatKg(model.averageDaily7), "7-day daily average"),
+          decisionInlineMetric(formatPct(model.volatility7 * 100), "7-day volatility"),
+        ],
+        [
+          `${formatKg(model.recentHarvest14Kg)} shipped in the last 14 harvest days.`,
+          `The last 7 days ranged from ${formatKg(recentDailyLow)} to ${formatKg(recentDailyHigh)} per day.`,
+          `Standard deviation is ${formatKg(model.deviationDaily7)} per day, which reads as ${model.consistencyLabel.toLowerCase()} cadence.`,
+        ],
+      );
+
+      pipelinePanelEl.innerHTML = decisionPanelMarkup(
+        `${model.activeFruitingLots.length} live lot${model.activeFruitingLots.length === 1 ? "" : "s"}`,
+        "Current shipment engine",
+        [
+          decisionInlineMetric(`${model.nearHarvestEntries.length} batches / ${model.nearHarvestBags} bags`, "Day-13+ near harvest"),
+          decisionInlineMetric(`${model.earlyPipelineEntries.length} batches / ${model.earlyPipelineBags} bags`, "Too early for ATP"),
+        ],
+        [
+          `${formatKg(model.recentHarvest7Kg)} harvested in the last 7 days from the live fruiting lot.`,
+          `${model.nearHarvestEntries.length} base batches are close enough to count conservatively in next-14 ATP.`,
+          `${excludedBags} bags from failed batches are excluded from the promise rather than treated as pending supply.`,
+        ],
+      );
+
+      riskPanelEl.innerHTML = decisionPanelMarkup(
+        `${topRiskBullets.length} watch factor${topRiskBullets.length === 1 ? "" : "s"}`,
+        "Current supply risks",
+        [
+          decisionInlineMetric(`${model.watchedNearHarvestBags} bags`, "Near-harvest on watch"),
+          decisionInlineMetric(`${model.activeFruitingLots.length}`, "Live lots carrying supply"),
+        ],
+        topRiskBullets,
+      );
+
+      vendorStabilityPanelEl.innerHTML = decisionPanelMarkup(
+        model.watchedVendorExposure.size >= 2 ? "Systemic watch" : `${model.vendorExposureList.length} active vendors`,
+        "Vendor effect on current promise",
+        [
+          decisionInlineMetric(`${leadVendor[0]} ${leadVendor[1]} bags`, "Largest open exposure"),
+          decisionInlineMetric(`${secondVendor[0]} ${secondVendor[1]} bags`, "Second-largest exposure"),
+        ],
+        [
+          `${leadVendor[0]} and ${secondVendor[0]} account for ${formatPct(topVendorShare)} of open pipeline bags that matter to the next promise window.`,
+          model.systemicVendorDriver,
+          excludedBags ? `Historical failed-batch volume remains excluded from ATP instead of inflating the vendor promise.` : "No excluded vendor failure is inflating the current ATP number.",
+        ],
+      );
+    }
+
+    function getExpectedBags(substrateType, bagSize) {
+      const substrate = String(substrateType || "").toLowerCase().replace(/\s+/g, "");
+      const size = String(bagSize || "").toLowerCase().replace(/\s+/g, "");
+      if (substrate.includes("wheat") && size.startsWith("1")) {
+        return { expectedBags: 316, baseline: "Wheat straw baseline: 316 bags per batch at 1 kg." };
+      }
+      if (substrate.includes("cotton") && size.startsWith("2")) {
+        return { expectedBags: 125, baseline: "Cotton husk baseline: 125 bags per batch at 2 kg." };
+      }
+      return { expectedBags: 125, baseline: "Default cotton husk baseline: 125 bags per batch at 2 kg." };
+    }
+
+    function getProductionPairs() {
+      return pasteurizationRows.map((row, index) => {
+        const bagging = baggingRows[index] || null;
+        const expected = getExpectedBags(row.substrateType, row.bagSize);
+        const actualBags = bagging ? bagging.bagsFilled : 0;
+        const variance = actualBags - expected.expectedBags;
+        const latestIncubation = allRows
+          .filter((entry) => entry.batchNorm === row.batchNorm)
+          .sort((a, b) => (a.date !== b.date ? a.date.localeCompare(b.date) : a.day - b.day))
+          .slice(-1)[0];
+        return { row, bagging, latestIncubation, ...expected, actualBags, variance };
+      }).filter((entry) => entry.row && entry.row.batchNorm);
+    }
+
+    function buildProductionBridge() {
+      const pairs = getProductionPairs();
+      const focused = getFocusedBatchContext();
+      const visiblePairs = focused
+        ? pairs.filter((entry) => entry.row.batchNorm === focused.baseBatch || entry.row.batchNorm === focused.batch)
+        : pairs;
+
+      const totalActual = visiblePairs.reduce((sum, entry) => sum + entry.actualBags, 0);
+      const totalBaselineCapacity = visiblePairs.reduce((sum, entry) => sum + entry.expectedBags, 0);
+      const averagePrepShare = visiblePairs.length
+        ? ((visiblePairs.reduce((sum, entry) => sum + (entry.expectedBags ? (entry.actualBags / entry.expectedBags) : 0), 0) / visiblePairs.length) * 100).toFixed(0)
+        : "0";
+
+      productionSummaryEl.innerHTML = [
+        { value: `${visiblePairs.length}`, label: focused ? "Related production batches" : "Batches with target baseline", tone: "stage-incubation" },
+        { value: `${totalActual}`, label: focused ? "Prepared bags in focused context" : "Actual bags prepared from LOG 5", tone: "stage-incubation" },
+        { value: `${totalBaselineCapacity}`, label: focused ? "Focused baseline capacity" : "Full-batch baseline capacity", tone: "stage-fruiting" },
+        { value: `${averagePrepShare}%`, label: focused ? "Focused prep level vs baseline" : "Average prep level vs full baseline", tone: "stage-harvest" },
+      ].map((item) => `
+        <article class="yield-summary-card ${item.tone}">
+          <div class="yield-summary-value">${item.value}</div>
+          <div class="yield-summary-label">${item.label}</div>
+        </article>
+      `).join("");
+
+      productionCardsEl.innerHTML = visiblePairs.map((entry) => {
+        const prepShare = entry.expectedBags ? ((entry.actualBags / entry.expectedBags) * 100).toFixed(0) : "0";
+        const latestDate = entry.latestIncubation ? formatIsoDate(entry.latestIncubation.date) : "No incubation row";
+        return `
+          <article class="yield-card stage-incubation">
+            <div class="yield-topline">
+              <div class="yield-title">${entry.row.batchNorm}</div>
+              <div class="yield-kilo">${entry.actualBags} bags</div>
+            </div>
+            <div class="yield-meta">
+              ${entry.row.substrateType || "Unknown substrate"} | ${entry.row.bagSize || "Unknown size"} | Pasteurised ${entry.row.date ? formatIsoDate(entry.row.date) : "N/A"}
+            </div>
+            <div class="yield-note"><strong>Actual bags prepared:</strong> ${entry.actualBags} bags${entry.bagging && entry.bagging.targetWeight ? ` at ${entry.bagging.targetWeight}` : ""}.</div>
+            <div class="yield-note"><strong>Full-batch baseline:</strong> ${entry.expectedBags} bags. ${entry.baseline}</div>
+            <div class="yield-note"><strong>Prep level:</strong> ${prepShare}% of the standard full-batch baseline. This is context, not a failure score.</div>
+            <div class="yield-note"><strong>Latest incubation checkpoint:</strong> ${latestDate}${entry.latestIncubation ? ` | Day ${entry.latestIncubation.day} | ${entry.latestIncubation.growth} growth` : ""}.</div>
+            ${focusButton(entry.row.batchNorm, entry.row.batchNorm)}
+          </article>
+        `;
+      }).join("") || `<div class="event-row"><div class="event-date">None</div><div class="event-main">${focused ? `No related LOG 5 / LOG 6 production row was found for ${focused.batch}.` : "No LOG 5 / LOG 6 production rows found in the workbook export."}</div><div class="event-score">clear</div></div>`;
+      bindBatchFocusLinks(productionCardsEl);
+    }
+
+    function buildVendorSummary(rows) {
+      const vendorEntries = [...rows.reduce((map, row) => {
+        const vendor = row.vendor || "Unknown";
+        if (!map.has(vendor)) {
+          map.set(vendor, {
+            vendor,
+            removed: 0,
+            alerts: 0,
+            batchBagCounts: new Map(),
+            latest: null,
+          });
+        }
+        const entry = map.get(vendor);
+        entry.removed += row.removed || 0;
+        entry.alerts += Number(Boolean(row.contamination)) + Number(Boolean(row.smell));
+        entry.batchBagCounts.set(row.batchNorm, Math.max(entry.batchBagCounts.get(row.batchNorm) || 0, row.bagCount || 0));
+        if (!entry.latest || row.date > entry.latest.date || (row.date === entry.latest.date && row.day > entry.latest.day)) {
+          entry.latest = row;
+        }
+        return map;
+      }, new Map()).values()].map((entry) => ({
+        ...entry,
+        bagCount: [...entry.batchBagCounts.values()].reduce((sum, value) => sum + value, 0),
+        batchCount: entry.batchBagCounts.size,
+      })).sort((a, b) => b.removed - a.removed || a.vendor.localeCompare(b.vendor));
+
+      const totalVendorBags = vendorEntries.reduce((sum, entry) => sum + entry.bagCount, 0);
+      const totalRemoved = vendorEntries.reduce((sum, entry) => sum + entry.removed, 0);
+      const activeWatch = vendorEntries.filter((entry) => entry.removed > 0 || entry.alerts > 0).length;
+
+      vendorSummaryEl.innerHTML = [
+        { value: `${vendorEntries.length}`, label: "Tracked vendors", tone: "stage-incubation" },
+        { value: `${totalVendorBags}`, label: "Vendor-tagged bags in LOG 9", tone: "stage-fruiting" },
+        { value: `${totalRemoved}`, label: "Bags lost across vendor rows", tone: "stage-contamination" },
+        { value: `${activeWatch}`, label: "Vendors with watch flags", tone: "stage-harvest" },
+      ].map((item) => `
+        <article class="yield-summary-card ${item.tone}">
+          <div class="yield-summary-value">${item.value}</div>
+          <div class="yield-summary-label">${item.label}</div>
+        </article>
+      `).join("");
+
+      vendorCardsEl.innerHTML = vendorEntries.map((entry) => {
+        const latest = entry.latest;
+        const lossRate = entry.bagCount ? ((entry.removed / entry.bagCount) * 100).toFixed(1) : "0.0";
+        return `
+          <article class="yield-card stage-incubation">
+            <div class="yield-topline">
+              <div class="yield-title">${entry.vendor}</div>
+              <div class="yield-kilo">${entry.removed} lost</div>
+            </div>
+            <div class="yield-meta">
+              ${entry.batchCount} vendor-tagged batch line${entry.batchCount === 1 ? "" : "s"} | ${entry.bagCount} logged bags
+            </div>
+            <div class="yield-note"><strong>Loss rate:</strong> ${lossRate}% of logged vendor-tagged bags.</div>
+            <div class="yield-note"><strong>Alerts:</strong> ${entry.alerts} contamination/smell events across incubation rows.</div>
+            <div class="yield-note"><strong>Latest status:</strong> ${latest ? `${latest.batchNorm} | Day ${latest.day} | ${latest.growth} on ${formatIsoDate(latest.date)}` : "No incubation row"}</div>
+            ${latest ? focusButton(latest.batchNorm, latest.batchNorm) : ""}
+          </article>
+        `;
+      }).join("") || `<div class="event-row"><div class="event-date">None</div><div class="event-main">No vendor-tagged incubation rows found in LOG 9.</div><div class="event-score">clear</div></div>`;
+      bindBatchFocusLinks(vendorCardsEl);
+    }
+
+    function buildFocusedBatchSummary(rows) {
+      const batch = filterEl.value;
+      if (!batch || batch === "all") {
+        focusedBatchPanelEl.hidden = true;
+        focusedBatchSummaryEl.innerHTML = "";
+        focusedBatchCardsEl.innerHTML = "";
+        return;
+      }
+
+      const batchRows = allRows.filter((row) => row.batchNorm === batch).sort((a, b) => a.day - b.day || a.date.localeCompare(b.date));
+      if (!batchRows.length) {
+        focusedBatchPanelEl.hidden = true;
+        focusedBatchSummaryEl.innerHTML = "";
+        focusedBatchCardsEl.innerHTML = "";
+        return;
+      }
+
+      const latest = batchRows[batchRows.length - 1];
+      const production = getProductionPairs().find((entry) => entry.row.batchNorm === (latest.baseBatch || batch) || entry.row.batchNorm === batch);
+      const fruitingMatches = fruitingRows.filter((row) => row.sourceBatchIds.includes(latest.baseBatch || batch) || row.sourceBatchIds.includes(batch));
+      const fruitingLots = [...new Set(fruitingMatches.map((row) => row.fruitingLot))];
+      const harvestMatches = harvestRows.filter((row) => fruitingLots.includes(row.fruitingLot));
+      const harvestedKg = harvestMatches.reduce((sum, row) => sum + (row.quantityHarvestedKg || 0), 0);
+      const rejectedKg = harvestMatches.reduce((sum, row) => sum + (row.quantityRejectedKg || 0), 0);
+      const totalRemoved = batchRows.reduce((sum, row) => sum + (row.removed || 0), 0);
+      const alertCount = batchRows.reduce((sum, row) => sum + Number(Boolean(row.contamination)) + Number(Boolean(row.smell)), 0);
+      const preparedBags = production ? production.actualBags : Math.max(...batchRows.map((row) => row.bagCount || 0), 0);
+      const summaryCards = [
+        { value: `${preparedBags || 0}`, label: "Prepared / logged bags", tone: "stage-incubation" },
+        { value: `${totalRemoved}`, label: "Bags removed in incubation", tone: totalRemoved > 0 ? "stage-contamination" : "stage-incubation" },
+        { value: `${fruitingLots.length}`, label: "Linked fruiting lots", tone: fruitingLots.length ? "stage-fruiting" : "stage-incubation" },
+        { value: `${harvestedKg.toFixed(2)} kg`, label: "Linked harvest output", tone: harvestedKg > 0 ? "stage-harvest" : "stage-fruiting" },
+      ];
+
+      focusedBatchSummaryEl.innerHTML = summaryCards.map((item) => `
+        <article class="yield-summary-card ${item.tone}">
+          <div class="yield-summary-value">${item.value}</div>
+          <div class="yield-summary-label">${item.label}</div>
+        </article>
+      `).join("");
+
+      const note = latest.notes && latest.notes !== "-" ? latest.notes : latest.removalReason && latest.removalReason !== "-" ? latest.removalReason : "No immediate note logged on the latest incubation check.";
+      focusedBatchCardsEl.innerHTML = `
+        <article class="yield-card stage-incubation">
+          <div class="yield-topline">
+            <div class="yield-title">${batch}</div>
+            <div class="yield-kilo">Day ${latest.day}</div>
+          </div>
+          <div class="yield-meta">
+            Latest growth ${latest.growth} on ${formatIsoDate(latest.date)} | ${alertCount} logged alert${alertCount === 1 ? "" : "s"}
+          </div>
+          <div class="yield-note"><strong>Incubation note:</strong> ${note}</div>
+          <div class="yield-note"><strong>Production baseline:</strong> ${production ? `${production.actualBags} actual bags vs ${production.expectedBags} full-batch baseline | ${production.row.substrateType || "Unknown substrate"} | ${production.row.bagSize || "Unknown size"}` : "No linked LOG 5 / LOG 6 production pair found."}</div>
+          <div class="yield-note"><strong>Fruiting linkage:</strong> ${fruitingLots.length ? fruitingLots.join(", ") : "This batch is not yet represented in LOG 10."}</div>
+          <div class="yield-note"><strong>Harvest linkage:</strong> ${harvestMatches.length ? `${harvestedKg.toFixed(2)} kg harvested${rejectedKg ? ` | ${rejectedKg.toFixed(2)} kg rejected` : ""}` : "No linked harvest rows yet."}</div>
+        </article>
+      `;
+
+      focusedBatchPanelEl.hidden = false;
+    }
+
+    function buildYieldBridge() {
+      const focused = getFocusedBatchContext();
+      const productionPairs = getProductionPairs();
+      const actualBagsByBatch = new Map(productionPairs.map((entry) => [entry.row.batchNorm, entry.actualBags]));
+      const incubationVariantsByBaseBatch = allRows.reduce((map, row) => {
+        const baseBatch = row.baseBatch || row.batchNorm;
+        if (!map.has(baseBatch)) {
+          map.set(baseBatch, new Map());
+        }
+        map.get(baseBatch).set(row.batchNorm, Math.max(map.get(baseBatch).get(row.batchNorm) || 0, row.bagCount || 0));
+        return map;
+      }, new Map());
+      const harvestByLot = harvestRows.reduce((map, row) => {
+        if (!map.has(row.fruitingLot)) map.set(row.fruitingLot, []);
+        map.get(row.fruitingLot).push(row);
+        return map;
+      }, new Map());
+      const fruitingByLot = fruitingRows.reduce((map, row) => {
+        if (!map.has(row.fruitingLot)) {
+          map.set(row.fruitingLot, {
+            fruitingLot: row.fruitingLot,
+            room: row.room,
+            fruitingStartDate: row.fruitingStartDate || row.date,
+            date: row.date,
+            tempReading: row.tempReading,
+            humidityReading: row.humidityReading,
+            fansWorking: row.fansWorking,
+            issuesObserved: row.issuesObserved,
+            actionTaken: row.actionTaken,
+            sourceBatchIds: new Set(),
+          });
+        }
+        const entry = map.get(row.fruitingLot);
+        row.sourceBatchIds.forEach((batchId) => entry.sourceBatchIds.add(batchId));
+        if (row.date && (!entry.date || row.date > entry.date)) {
+          entry.date = row.date;
+          entry.room = row.room || entry.room;
+          entry.fruitingStartDate = row.fruitingStartDate || entry.fruitingStartDate;
+          entry.tempReading = row.tempReading || entry.tempReading;
+          entry.humidityReading = row.humidityReading || entry.humidityReading;
+          entry.fansWorking = row.fansWorking ?? entry.fansWorking;
+          entry.issuesObserved = row.issuesObserved || entry.issuesObserved;
+          entry.actionTaken = row.actionTaken || entry.actionTaken;
+        }
+        return map;
+      }, new Map());
+
+      const cards = [...fruitingByLot.values()]
+        .map((row) => {
+          const harvestEntries = harvestByLot.get(row.fruitingLot) || [];
+          const harvestedKg = harvestEntries.reduce((sum, entry) => sum + (entry.quantityHarvestedKg || 0), 0);
+          const rejectionKg = harvestEntries.reduce((sum, entry) => sum + (entry.quantityRejectedKg || 0), 0);
+          const harvestDates = harvestEntries.map((entry) => entry.date).filter(Boolean);
+          const sourceBatchIds = [...row.sourceBatchIds];
+          const sourceBatchDisplay = sourceBatchIds.map((batchId) => {
+            const variants = incubationVariantsByBaseBatch.get(batchId);
+            if (!variants || variants.size === 0) {
+              return { batchId, focusBatch: batchId, label: batchId };
+            }
+            const details = [...variants.entries()]
+              .sort(([left], [right]) => left.localeCompare(right))
+              .map(([variant, bagCount]) => `${variant} (${bagCount} bags)`)
+              .join(", ");
+            const firstVariant = [...variants.keys()].sort()[0] || batchId;
+            return { batchId, focusBatch: firstVariant, label: `${batchId}: ${details}` };
+          });
+          const linkedActualBags = sourceBatchIds.reduce((sum, batchId) => sum + (actualBagsByBatch.get(batchId) || 0), 0);
+          return {
+            row: { ...row, sourceBatchIds, sourceBatchDisplay },
+            harvestedKg,
+            rejectionKg,
+            harvestDates,
+            harvestCount: harvestEntries.length,
+            linkedActualBags,
+          };
+        })
+        .filter((entry) => {
+          if (!focused) {
+            return true;
+          }
+          return entry.row.sourceBatchIds.includes(focused.baseBatch) || entry.row.sourceBatchIds.includes(focused.batch);
+        })
+        .sort((a, b) => (b.harvestedKg - a.harvestedKg) || b.row.date.localeCompare(a.row.date));
+
+      const incubationBatches = new Set((focused ? allRows.filter((row) => row.batchNorm === focused.batch || row.baseBatch === focused.baseBatch) : allRows).map((row) => row.batchNorm));
+      const fruitingBatches = new Set(cards.flatMap((entry) => entry.row.sourceBatchIds));
+      const representedShare = incubationBatches.size ? ((fruitingBatches.size / incubationBatches.size) * 100).toFixed(0) : "0";
+      const totalHarvestedKg = cards.reduce((sum, card) => sum + card.harvestedKg, 0);
+      const totalLinkedActualBags = cards.reduce((sum, card) => sum + card.linkedActualBags, 0);
+      const totalPreparedBags = focused
+        ? productionPairs.filter((entry) => entry.row.batchNorm === focused.baseBatch || entry.row.batchNorm === focused.batch).reduce((sum, entry) => sum + entry.actualBags, 0)
+        : productionPairs.reduce((sum, entry) => sum + entry.actualBags, 0);
+      const unlinkedPreparedBags = Math.max(totalPreparedBags - totalLinkedActualBags, 0);
+      const linkedPreparedShare = totalPreparedBags ? ((totalLinkedActualBags / totalPreparedBags) * 100).toFixed(0) : "0";
+      const kgPer100PreparedBags = totalLinkedActualBags ? ((totalHarvestedKg / totalLinkedActualBags) * 100).toFixed(2) : "0.00";
+      const projectedFullPreparedHarvestKg = totalPreparedBags ? ((totalHarvestedKg / Math.max(totalLinkedActualBags, 1)) * totalPreparedBags).toFixed(2) : "0.00";
+      const benchmarkLow = 25;
+      const benchmarkHigh = 40;
+      const yieldBenchmarkStatus = Number(kgPer100PreparedBags) >= benchmarkLow ? "within or above benchmark" : "below benchmark";
+      const shortfallToLow = Math.max(benchmarkLow - Number(kgPer100PreparedBags), 0).toFixed(2);
+      const latestHarvestDate = harvestRows.map((row) => row.date).filter(Boolean).sort().slice(-1)[0];
+
+      yieldSummaryEl.innerHTML = [
+        { value: `${fruitingBatches.size}/${incubationBatches.size}`, label: focused ? "Focused batch lines that reached fruiting" : "Incubation batches that reached fruiting", tone: "stage-incubation", note: "" },
+        { value: `${representedShare}%`, label: focused ? "Focused incubation rows represented in LOG 10" : "Tracked incubation batches represented in LOG 10", tone: "stage-fruiting", note: "" },
+        { value: `${linkedPreparedShare}%`, label: focused ? "Focused prepared bags in the yield bridge" : "Prepared bags currently represented in the yield bridge", tone: "stage-incubation", note: "" },
+        { value: `${kgPer100PreparedBags} kg / 100 bags`, label: focused ? "Focused realized harvest rate" : "Current realized harvest rate", tone: Number(kgPer100PreparedBags) >= benchmarkLow ? "stage-harvest" : "stage-contamination", note: `Benchmark: ${benchmarkLow}-${benchmarkHigh} kg | Gap to minimum: -${shortfallToLow} kg` },
+        { value: `${projectedFullPreparedHarvestKg} kg`, label: focused ? "Focused projected output" : "Projected harvest if all prepared bags perform at current rate", tone: "stage-harvest", note: "" },
+        { value: latestHarvestDate ? formatIsoDate(latestHarvestDate) : "N/A", label: focused ? "Latest harvest in focused context" : "Latest linked harvest date", tone: "stage-harvest", note: "" },
+      ].map((item) => `
+        <article class="yield-summary-card ${item.tone}">
+          <div class="yield-summary-value">${item.value}</div>
+          <div class="yield-summary-label">${item.label}</div>
+          ${item.note ? `<div class="yield-summary-note">${item.note}</div>` : ""}
+        </article>
+      `).join("");
+
+      yieldBridgeEl.innerHTML = cards.map(({ row, harvestedKg, rejectionKg, harvestDates, harvestCount, linkedActualBags }) => `
+        <article class="yield-card stage-fruiting ${cards.length === 1 ? "full-span" : ""}">
+          <div class="yield-topline">
+            <div class="yield-title">${row.fruitingLot}</div>
+            <div class="yield-kilo">${harvestedKg.toFixed(2)} kg</div>
+          </div>
+          <div class="yield-meta">
+            Room ${row.room || "N/A"} | Fruiting start ${row.fruitingStartDate || row.date || "N/A"} | Harvest entries ${harvestCount}
+          </div>
+          <div class="yield-note"><strong>Source batches:</strong> ${row.sourceBatchDisplay.length ? row.sourceBatchDisplay.map((entry) => `${entry.label} ${focusButton(entry.batchId, entry.focusBatch)}`).join(" ") : "Not recorded"}</div>
+          <div class="yield-note"><strong>Actual bags prepped:</strong> ${linkedActualBags || "Not linked from LOG 5/6"}.</div>
+          <div class="yield-note"><strong>Environment:</strong> ${row.tempReading || "N/A"} C, humidity ${row.humidityReading || "N/A"}, fans ${row.fansWorking ? "on" : "not confirmed"}.</div>
+          <div class="yield-note"><strong>Harvest:</strong> ${harvestDates.length ? `logged on ${harvestDates.join(", ")}` : "No linked harvest rows yet"}${rejectionKg ? `, ${rejectionKg.toFixed(2)} kg rejected.` : "."}</div>
+          <div class="yield-note"><strong>Yield rate:</strong> ${linkedActualBags ? ((harvestedKg / linkedActualBags) * 100).toFixed(2) : "0.00"} kg per 100 linked prepared bags.</div>
+          <div class="yield-note"><strong>Benchmark:</strong> Typical flush-1 range is ${benchmarkLow}-${benchmarkHigh} kg per 100 bags. Current status: ${yieldBenchmarkStatus} unless the flush window is still incomplete.</div>
+          <div class="yield-note"><strong>Context:</strong> ${totalLinkedActualBags} of ${totalPreparedBags} prepared bags are currently represented in the yield bridge; ${unlinkedPreparedBags} prepared bags are not yet linked to fruiting output.</div>
+          <div class="yield-note"><strong>Projected full prepared output:</strong> ${projectedFullPreparedHarvestKg} kg if all ${totalPreparedBags} prepared bags perform at the current realized rate.</div>
+          <div class="yield-note"><strong>Fruiting log note:</strong> ${row.issuesObserved || "No issue logged"}${row.actionTaken ? ` | ${row.actionTaken}` : ""}${row.sourceBatchIds.some((batchId) => batchId === "SB-2026/02/25-05") ? " | Interpretation: when NN spawn contamination is called out in the mixed LK/NN incubation rows, treat the LK bags as likely cross-contaminated in the shared incubation context rather than as a separate LK spawn-origin issue." : ""}</div>
+        </article>
+      `).join("") || `<div class="event-row"><div class="event-date">None</div><div class="event-main">${focused ? `No related fruiting lot was found for ${focused.batch}.` : "No fruiting lots found in the linked workbook export."}</div><div class="event-score">clear</div></div>`;
+      bindBatchFocusLinks(yieldBridgeEl);
+    }
+
+    function renderTimeline(rows) {
+      const groups = byBatch(rows);
+      const width = Math.max(980, 320 + (Math.max(...rows.map((row) => row.day), 1) * 30));
+      const height = Math.max(236, groups.length * 94 + 126);
+      const margin = { top: 92, right: 170, bottom: 44, left: 160 };
+      const plotWidth = width - margin.left - margin.right;
+      const plotHeight = height - margin.top - margin.bottom;
+      const maxDay = Math.max(...rows.map((row) => row.day), 1);
+
+      const x = (day) => margin.left + (day / maxDay) * plotWidth;
+      const y = (index) => margin.top + index * (plotHeight / Math.max(groups.length - 1, 1));
+
+      let svg = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Batch progress timeline" class="chart-enter-soft" style="width:${width}px;max-width:none">`;
+      for (let tick = 0; tick <= maxDay; tick += 4) {
+        const xPos = x(tick);
+        svg += `<line x1="${xPos}" y1="${margin.top - 8}" x2="${xPos}" y2="${height - margin.bottom + 6}" stroke="rgba(33,46,36,0.10)" />`;
+        svg += `<text x="${xPos}" y="${height - 14}" text-anchor="middle" class="axis">Day ${tick}</text>`;
+      }
+
+      groups.forEach((group, index) => {
+        const yPos = y(index);
+        const points = group.rows.map((row) => `${x(row.day)},${yPos - growthValue[row.growth] * 12}`).join(" ");
+        const removalRows = group.rows.filter((row) => row.removed > 0);
+        const removalSlots = new Map();
+        let cluster = [];
+
+        const flushCluster = () => {
+          const slotPattern = [
+            { dx: 0, direction: "above", extra: 0 },
+            { dx: -34, direction: "below", extra: 0 },
+            { dx: 34, direction: "above", extra: 6 },
+            { dx: -54, direction: "below", extra: 12 },
+            { dx: 54, direction: "above", extra: 18 },
+          ];
+          cluster.forEach((row, clusterIndex) => {
+            removalSlots.set(row, slotPattern[Math.min(clusterIndex, slotPattern.length - 1)]);
+          });
+          cluster = [];
+        };
+
+        removalRows.forEach((row) => {
+          if (!cluster.length) {
+            cluster.push(row);
+            return;
+          }
+          const previous = cluster[cluster.length - 1];
+          if (Math.abs(x(row.day) - x(previous.day)) < 92) {
+            cluster.push(row);
+            return;
+          }
+          flushCluster();
+          cluster.push(row);
+        });
+        flushCluster();
+
+        svg += `<text x="${margin.left - 14}" y="${yPos - 2}" text-anchor="end" class="axis chart-interactive" tabindex="0" role="button" data-batch-focus="${escapeAttr(group.batch)}" data-tooltip="${escapeAttr(`Focus ${group.batch}`)}">${group.batch}</text>`;
+        svg += `<line x1="${margin.left}" y1="${yPos}" x2="${width - margin.right}" y2="${yPos}" stroke="rgba(33,46,36,0.09)" />`;
+        svg += `<polyline fill="none" stroke="rgba(18,60,50,0.26)" stroke-width="3" points="${points}" class="chart-enter-soft chart-interactive" style="animation-delay:${index * 50}ms" data-batch-focus="${escapeAttr(group.batch)}" data-tooltip="${escapeAttr(`Focus ${group.batch}`)}" />`;
+
+        group.rows.forEach((row) => {
+          const cx = x(row.day);
+          const cy = yPos - growthValue[row.growth] * 12;
+          const hasRemoval = row.removed > 0;
+          const majorRemoval = row.removed >= 25;
+          const radius = majorRemoval ? 11.5 : row.contamination || row.smell ? 9 : 7;
+          if (row.contamination || row.smell) {
+            const haloColor = row.contamination && row.smell
+              ? "rgba(176, 64, 208, 0.18)"
+              : row.contamination
+                ? "rgba(255, 43, 43, 0.20)"
+                : "rgba(124, 58, 237, 0.22)";
+            svg += `<circle cx="${cx}" cy="${cy}" r="${radius + 3.2}" fill="${haloColor}" stroke="none" class="chart-enter-soft chart-point" style="animation-delay:${(index * 40) + (row.day * 14)}ms" />`;
+          }
+          const pointTitle = `${group.batch} | Day ${row.day} | ${row.growth} growth | ${formatIsoDate(row.date)}${row.contamination ? " | visual alert" : ""}${row.smell ? " | smell alert" : ""}${row.removed ? ` | ${row.removed} bags lost` : ""}`;
+          svg += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="${growthColor[row.growth]}" stroke="rgba(255,255,255,0.9)" stroke-width="2.2" class="chart-enter chart-point chart-interactive" style="animation-delay:${(index * 40) + (row.day * 14)}ms" data-batch-focus="${escapeAttr(group.batch)}" tabindex="0" role="button" data-tooltip="${escapeAttr(pointTitle)}"></circle>`;
+          if (row.contamination && row.smell) {
+            const ringRadius = radius + 0.9;
+            const circumference = 2 * Math.PI * ringRadius;
+            const half = circumference / 2;
+            svg += `<circle cx="${cx}" cy="${cy}" r="${ringRadius}" fill="none" stroke="#ff2b2b" stroke-width="4.6" stroke-dasharray="${half} ${half}" stroke-linecap="butt" transform="rotate(-90 ${cx} ${cy})" class="chart-enter-soft chart-point" style="animation-delay:${(index * 40) + (row.day * 14)}ms" />`;
+            svg += `<circle cx="${cx}" cy="${cy}" r="${ringRadius}" fill="none" stroke="#7c3aed" stroke-width="4.6" stroke-dasharray="${half} ${half}" stroke-dashoffset="${half}" stroke-linecap="butt" transform="rotate(-90 ${cx} ${cy})" class="chart-enter-soft chart-point" style="animation-delay:${(index * 40) + (row.day * 14)}ms" />`;
+          } else if (row.contamination) {
+            svg += `<circle cx="${cx}" cy="${cy}" r="${radius + 0.9}" fill="none" stroke="#ff2b2b" stroke-width="4.6" class="chart-enter-soft chart-point" style="animation-delay:${(index * 40) + (row.day * 14)}ms" />`;
+          } else if (row.smell) {
+            svg += `<circle cx="${cx}" cy="${cy}" r="${radius + 0.9}" fill="none" stroke="#7c3aed" stroke-width="4.2" class="chart-enter-soft chart-point" style="animation-delay:${(index * 40) + (row.day * 14)}ms" />`;
+          }
+          if (hasRemoval) {
+            const slot = removalSlots.get(row) || { dx: 0, direction: "above", extra: 0 };
+            const placeBelow = majorRemoval ? false : slot.direction === "below";
+            let labelOffset = (majorRemoval ? 30 : 18) + slot.extra;
+            if (row.removed === 1 || row.removed === 6) {
+              labelOffset += 10;
+            }
+            const labelY = placeBelow ? cy + radius + labelOffset : cy - radius - labelOffset;
+            const lineEndY = placeBelow ? labelY - 12 : labelY + 8;
+            const labelText = `${row.removed} lost`;
+            const labelWidth = Math.max(66, (labelText.length * 7) + 18);
+            const rightEdgeBias = cx > width - margin.right - 48 ? -Math.max(48, labelWidth / 2 + 12) : 0;
+            const leftEdgeBias = cx < margin.left + 48 ? Math.max(48, labelWidth / 2 + 12) : 0;
+            const preferredX = cx + (majorRemoval ? 0 : slot.dx) + rightEdgeBias + leftEdgeBias;
+            const labelX = Math.max(margin.left + (labelWidth / 2) + 6, Math.min(preferredX, width - margin.right - (labelWidth / 2) - 6));
+            const textAnchor = "middle";
+            svg += `<line x1="${cx}" y1="${placeBelow ? cy + radius + 2 : cy - radius - 2}" x2="${labelX}" y2="${lineEndY}" stroke="${majorRemoval ? "#a12d1e" : "rgba(161,45,30,0.55)"}" stroke-width="${majorRemoval ? "2.4" : "1.6"}" class="chart-enter-soft" style="animation-delay:${(index * 40) + (row.day * 14)}ms" />`;
+            svg += `<rect x="${labelX - (labelWidth / 2)}" y="${labelY - 16}" width="${labelWidth}" height="22" rx="11" fill="#fff4f1" stroke="#a12d1e" stroke-width="1.4" class="chart-enter-soft" style="animation-delay:${(index * 40) + (row.day * 14)}ms" />`;
+            svg += `<text x="${labelX}" y="${labelY}" text-anchor="${textAnchor}" class="axis" fill="#a12d1e" style="font-weight:${majorRemoval ? "700" : "600"}">${labelText}</text>`;
+          }
+        });
+
+        const latest = group.rows[group.rows.length - 1];
+        const latestLabelX = Math.min(x(latest.day) + 10, width - margin.right - 8);
+        const latestLabelAnchor = latestLabelX >= width - margin.right - 12 ? "end" : "start";
+        svg += `<text x="${latestLabelX}" y="${yPos - growthValue[latest.growth] * 12 - 10}" text-anchor="${latestLabelAnchor}" class="axis">${formatIsoDate(latest.date)}</text>`;
+
+      });
+
+      svg += `</svg>`;
+      timelineEl.innerHTML = svg;
+      bindBatchFocusLinks(timelineEl);
+    }
+
+    function renderRemovals(rows) {
+      const dates = [...new Set(rows.map((row) => row.date))];
+      const daily = dates.map((date) => {
+        const dayRows = rows.filter((row) => row.date === date);
+        return {
+          date,
+          removed: dayRows.reduce((sum, row) => sum + row.removed, 0),
+          contamination: dayRows.filter((row) => row.contamination).length,
+          smell: dayRows.filter((row) => row.smell).length
+        };
+      });
+
+      const width = 860;
+      const height = 280;
+      const margin = { top: 20, right: 20, bottom: 48, left: 44 };
+      const plotWidth = width - margin.left - margin.right;
+      const plotHeight = height - margin.top - margin.bottom;
+      const maxRemoved = Math.max(...daily.map((entry) => entry.removed), 1);
+      const band = plotWidth / Math.max(daily.length, 1);
+      const x = (index) => margin.left + index * band + band * 0.14;
+      const barWidth = band * 0.72;
+      const y = (value) => margin.top + plotHeight - (value / maxRemoved) * plotHeight;
+
+      let svg = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Bag removals chart" class="chart-enter-soft">`;
+      for (let tick = 0; tick <= maxRemoved; tick += Math.max(1, Math.ceil(maxRemoved / 4))) {
+        const yPos = y(tick);
+        svg += `<line x1="${margin.left}" y1="${yPos}" x2="${width - margin.right}" y2="${yPos}" stroke="rgba(33,46,36,0.10)" />`;
+        svg += `<text x="${margin.left - 8}" y="${yPos + 4}" text-anchor="end" class="axis">${tick}</text>`;
+      }
+
+      daily.forEach((entry, index) => {
+        const heightPx = plotHeight - (y(entry.removed) - margin.top);
+        const fill = entry.removed > 0 ? "rgba(161,45,30,0.82)" : "rgba(18,60,50,0.18)";
+        svg += `<rect x="${x(index)}" y="${y(entry.removed)}" width="${barWidth}" height="${heightPx}" rx="8" fill="${fill}" class="chart-enter chart-bar chart-interactive" style="animation-delay:${index * 45}ms" data-tooltip="${escapeAttr(`${formatIsoDate(entry.date)} | ${entry.removed} bags lost${entry.contamination ? ` | ${entry.contamination} visual alert day rows` : ""}${entry.smell ? ` | ${entry.smell} smell alert day rows` : ""}`)}"></rect>`;
+        if (entry.contamination > 0) {
+          svg += `<circle cx="${x(index) + barWidth / 2}" cy="${y(entry.removed) - 10}" r="6" fill="#a12d1e" class="chart-enter-soft chart-point chart-interactive" style="animation-delay:${index * 45 + 60}ms" data-tooltip="${escapeAttr(`${formatIsoDate(entry.date)} | visual alert present on removal day`)}"></circle>`;
+        }
+        if (entry.smell > 0) {
+          svg += `<rect x="${x(index) + barWidth / 2 - 5}" y="${y(entry.removed) - 26}" width="10" height="10" rx="3" fill="#7c3aed" class="chart-enter-soft chart-point chart-interactive" style="animation-delay:${index * 45 + 80}ms" data-tooltip="${escapeAttr(`${formatIsoDate(entry.date)} | smell alert present on removal day`)}"></rect>`;
+        }
+        if (index % Math.ceil(daily.length / 8 || 1) === 0 || index === daily.length - 1) {
+          svg += `<text x="${x(index) + barWidth / 2}" y="${height - 16}" text-anchor="middle" class="axis">${formatIsoDate(entry.date)}</text>`;
+        }
+      });
+
+      svg += `</svg>`;
+      removalsEl.innerHTML = svg;
+    }
+
+    function renderDailyHarvest() {
+      const focused = getFocusedBatchContext();
+      const visibleHarvestRows = focused
+        ? harvestRows.filter((row) => {
+            const relatedFruiting = fruitingRows.filter((entry) => entry.fruitingLot === row.fruitingLot);
+            return relatedFruiting.some((entry) => entry.sourceBatchIds.includes(focused.baseBatch) || entry.sourceBatchIds.includes(focused.batch));
+          })
+        : harvestRows;
+      const dates = [...new Set(visibleHarvestRows.map((row) => row.date).filter(Boolean))].sort();
+      const daily = dates.map((date) => {
+        const dayRows = visibleHarvestRows.filter((row) => row.date === date);
+        return {
+          date,
+          harvestedKg: dayRows.reduce((sum, row) => sum + (row.quantityHarvestedKg || 0), 0),
+          rejectedKg: dayRows.reduce((sum, row) => sum + (row.quantityRejectedKg || 0), 0),
+        };
+      });
+
+      if (!daily.length) {
+        harvestSummaryEl.innerHTML = "";
+        dailyHarvestEl.innerHTML = `<div class="event-row"><div class="event-date">None</div><div class="event-main">${focused ? `No harvest rows linked to ${focused.batch} were found in LOG 11.` : "No harvest rows found in LOG 11."}</div><div class="event-score">clear</div></div>`;
+        return;
+      }
+
+      harvestSummaryEl.innerHTML = summarizeHarvest(daily)
+        .map((item) => `
+          <article class="yield-summary-card ${item.tone}">
+            <div class="yield-summary-value">${item.value}</div>
+            <div class="yield-summary-label">${item.label}</div>
+            ${item.note ? `<div class="yield-summary-note">${item.note}</div>` : ""}
+          </article>
+        `)
+        .join("");
+
+      const width = 860;
+      const height = 280;
+      const margin = { top: 20, right: 20, bottom: 48, left: 44 };
+      const plotWidth = width - margin.left - margin.right;
+      const plotHeight = height - margin.top - margin.bottom;
+      const maxHarvest = Math.max(...daily.map((entry) => entry.harvestedKg), 1);
+      const band = plotWidth / Math.max(daily.length, 1);
+      const x = (index) => margin.left + index * band + band * 0.14;
+      const barWidth = band * 0.72;
+      const y = (value) => margin.top + plotHeight - (value / maxHarvest) * plotHeight;
+
+      let svg = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Daily harvest chart" class="chart-enter-soft">`;
+      for (let tick = 0; tick <= maxHarvest; tick += Math.max(1, Math.ceil(maxHarvest / 4))) {
+        const yPos = y(tick);
+        svg += `<line x1="${margin.left}" y1="${yPos}" x2="${width - margin.right}" y2="${yPos}" stroke="rgba(33,46,36,0.10)" />`;
+        svg += `<text x="${margin.left - 8}" y="${yPos + 4}" text-anchor="end" class="axis">${tick}</text>`;
+      }
+
+      daily.forEach((entry, index) => {
+        const barY = y(entry.harvestedKg);
+        const heightPx = plotHeight - (barY - margin.top);
+        svg += `<rect x="${x(index)}" y="${barY}" width="${barWidth}" height="${heightPx}" rx="8" fill="rgba(25,135,84,0.86)" class="chart-enter chart-bar chart-interactive" style="animation-delay:${index * 45}ms" data-tooltip="${escapeAttr(`${formatIsoDate(entry.date)} | ${entry.harvestedKg.toFixed(2)} kg harvested${entry.rejectedKg ? ` | ${entry.rejectedKg.toFixed(2)} kg rejected` : ""}`)}"></rect>`;
+        if (entry.rejectedKg > 0) {
+          svg += `<circle cx="${x(index) + barWidth / 2}" cy="${barY - 10}" r="6" fill="#ff2b2b" class="chart-enter-soft chart-point chart-interactive" style="animation-delay:${index * 45 + 70}ms" data-tooltip="${escapeAttr(`${formatIsoDate(entry.date)} | ${entry.rejectedKg.toFixed(2)} kg rejected`)}"></circle>`;
+        }
+        if (index % Math.ceil(daily.length / 8 || 1) === 0 || index === daily.length - 1) {
+          svg += `<text x="${x(index) + barWidth / 2}" y="${height - 16}" text-anchor="middle" class="axis">${formatIsoDate(entry.date)}</text>`;
+        }
+      });
+
+      svg += `</svg>`;
+      dailyHarvestEl.innerHTML = svg;
+    }
+
+    function renderBatchCards(rows) {
+      const cards = latestPerBatch(rows)
+        .sort((a, b) => a.latest.day - b.latest.day)
+        .map(({ batch, latest, rows: entries }) => {
+          const contaminationCount = entries.filter((row) => row.contamination).length;
+          const totalRemoved = entries.reduce((sum, row) => sum + row.removed, 0);
+          const smellCount = entries.filter((row) => row.smell).length;
+          const note = latest.notes && latest.notes !== "-" ? latest.notes : latest.removalReason && latest.removalReason !== "-" ? latest.removalReason : "No immediate note logged on the latest check.";
+          const riskPill = contaminationCount > 0 || smellCount > 0 ? `<span class="pill risk">watch</span>` : `<span class="pill ${growthClass[latest.growth]}">${latest.growth}</span>`;
+          return `
+            <article class="batch-card${filterEl.value === batch ? " active-focus" : ""}" data-batch-focus="${batch}" tabindex="0" role="button">
+              <header>
+                <div class="batch-title">${batch}</div>
+                ${riskPill}
+              </header>
+              <div class="mini-stats">
+                <div><strong>Day ${latest.day}</strong> Latest incubation day</div>
+                <div><strong>${totalRemoved}</strong> Bags removed</div>
+                <div><strong>${contaminationCount + smellCount}</strong> Logged alerts</div>
+              </div>
+              <p class="focus-note"><strong>Latest status:</strong> ${latest.growth} growth on ${formatIsoDate(latest.date)}. ${note}</p>
+            </article>
+          `;
+        });
+
+      batchCardsEl.innerHTML = cards.join("");
+      bindBatchFocusLinks(batchCardsEl);
+    }
+
+    function renderEvents(rows) {
+      const items = rows
+        .filter((row) => row.contamination || row.smell || row.removed > 0 || (row.notes && row.notes !== "-" && row.notes.length > 20))
+        .sort((a, b) => b.date.localeCompare(a.date) || b.day - a.day)
+        .slice(0, 12)
+        .map((row) => {
+          const reasons = [];
+          if (row.contamination) reasons.push("contamination");
+          if (row.smell) reasons.push("smell");
+          if (row.removed > 0) reasons.push(`${row.removed} removed`);
+          const note = row.notes && row.notes !== "-" ? row.notes : row.removalReason && row.removalReason !== "-" ? row.removalReason : "No extra note captured.";
+          return `
+            <div class="event-row${filterEl.value === row.batchNorm ? " active-focus" : ""}" data-batch-focus="${row.batchNorm}" tabindex="0" role="button">
+              <div class="event-date">${formatIsoDate(row.date)}<br />Day ${row.day}</div>
+              <div class="event-main">
+                ${row.batchNorm}
+                <div class="event-sub">${note}</div>
+              </div>
+              <div class="event-score">${reasons.join(" · ") || row.growth}</div>
+            </div>
+          `;
+        });
+
+      eventsEl.innerHTML = items.join("") || `<div class="event-row"><div class="event-date">None</div><div class="event-main">No exceptions found in the selected scope.</div><div class="event-score">clear</div></div>`;
+      bindBatchFocusLinks(eventsEl);
+    }
+
+    function render() {
+      const rows = getRows();
+      renderFocusStatus();
+      buildHeroMeta();
+      buildKpis();
+      buildDecisionPanels();
+      buildFocusedBatchSummary(rows);
+      buildProductionBridge();
+      buildVendorSummary(rows);
+      renderTimeline(rows);
+      renderRemovals(rows);
+      renderDailyHarvest();
+      renderBatchCards(rows);
+      renderEvents(rows);
+      buildYieldBridge();
+      bindChartTooltips();
+    }
+
+    render();
+    window.setInterval(() => {
+      renderFocusStatus();
+      buildHeroMeta();
+      buildKpis();
+      buildDecisionPanels();
+    }, 60000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "generated_at": "2026-04-03T17:03:34.717412Z",
+  "snapshot_present": true,
+  "snapshot_bytes": 107739,
+  "row_counts": {
+    "bagging": 9,
+    "pasteurization": 9,
+    "incubation": 155,
+    "fruiting": 9,
+    "harvest": 32
+  },
+  "refresh_interval_minutes": 15,
+  "build_version": "0c9d854+dirty"
+}

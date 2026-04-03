@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-04-03T17:03:34.717412Z",
+  "source_type": "google_sheets_workbook_export",
+  "source_sheet": {
+    "spreadsheet_id": "1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg",
+    "logs": {
+      "bagging": "LOG 5",
+      "pasteurization": "LOG 6",
+      "incubation": "LOG 9 - Incubation Daily Check",
+      "fruiting": "LOG 10 - Fruiting Room And Envi",
+      "harvest": "LOG 11 - Harvest (Ccp 2)"
+    }
+  },
+  "row_counts": {
+    "bagging": 9,
+    "pasteurization": 9,
+    "incubation": 155,
+    "fruiting": 9,
+    "harvest": 32
+  },
+  "selected_batch": "all",
+  "build_version": "0c9d854+dirty",
+  "refresh_interval_minutes": 15
+}
