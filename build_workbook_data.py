@@ -104,7 +104,21 @@ def parse_yes_no(value: str) -> bool:
 
 
 def normalize_batch(value: str) -> str:
-    return re.sub(r"\s*\([^)]*\)", "", clean_string(value)).strip()
+    s = clean_string(value)
+    # Remove parenthetical annotations
+    s = re.sub(r"\s*\([^)]*\)", "", s).strip()
+    original = s
+    # Remove stray characters like ++ within batch IDs
+    s = re.sub(r"\+{1,}", "", s)
+    # Collapse multiple spaces to single
+    s = re.sub(r"\s{2,}", " ", s)
+    # Normalize "SB-YYMMDD-NN VID" → "SB-YYMMDD-NN-VID" (space before vendor suffix)
+    s = re.sub(r"(SB-\d{4}/\d{2}/\d{2}-\d{2})\s+([A-Z]{1,3})\b", r"\1-\2", s)
+    # Normalize "SB-YYMMDD-NNX" → "SB-YYMMDD-NN-X" (missing hyphen before vendor)
+    s = re.sub(r"(SB-\d{4}/\d{2}/\d{2}-\d{2})([A-Z])\b", r"\1-\2", s)
+    if s != original:
+        print(f"normalize_batch: {original!r} → {s!r}", file=sys.stderr)
+    return s
 
 
 def split_batch_ids(value: str) -> list[str]:
@@ -197,6 +211,8 @@ def build_incubation(records: list[dict[str, str]]) -> list[dict[str, object]]:
     payload = []
     for record in records:
         batch = clean_string(record["Substrate Batch ID (SB-YYMMDD-XX-VID)"])
+        if not batch:
+            continue
         payload.append(
             {
                 "date": parse_date(first_present(record, "Date", "Date(MMDDYYYY)")),

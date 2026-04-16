@@ -1,15 +1,15 @@
 {
   "ok": true,
-  "generated_at": "2026-04-16T00:30:04.415566Z",
+  "generated_at": "2026-04-16T21:37:23.749519Z",
   "snapshot_present": true,
-  "snapshot_bytes": 81294,
+  "snapshot_bytes": 84392,
   "row_counts": {
     "bagging": 12,
-    "pasteurization": 11,
+    "pasteurization": 12,
     "incubation": 115,
-    "fruiting": 17,
-    "harvest": 42
+    "fruiting": 20,
+    "harvest": 44
   },
   "refresh_interval_minutes": 15,
-  "build_version": "33716b0+dirty"
+  "build_version": "0bab8cd+dirty"
 }

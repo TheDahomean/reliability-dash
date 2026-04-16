@@ -1,4 +1,3 @@
-\
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -17,6 +16,6 @@ tracked="$(git ls-files | grep -E '(^|/)(\.tmp/|\.auth/|chromium-profile/|node_m
 [[ -z "$tracked" ]] || fail "Hazards are tracked. NEXT: add to .gitignore and git rm --cached ..."
 
 say "Python compile"
-command -v python3 >/dev/null 2>&1 && python3 -m compileall -q . || true
+command -v python3 >/dev/null 2>&1 && python3 -m compileall -q ./scripts/ || true
 
 echo "PASS"

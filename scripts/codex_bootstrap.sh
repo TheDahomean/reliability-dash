@@ -1,4 +1,3 @@
-\
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -50,3 +49,8 @@ done <<< "$staged"
 HOOK
 chmod +x .githooks/pre-commit
 git config core.hooksPath .githooks
+
+# Install cron refresh job (idempotent — removes any stale entry first)
+CRON_LINE="*/15 * * * * $ROOT/scripts/cron_refresh.sh >> $ROOT/logs/refresh.log 2>&1"
+(crontab -l 2>/dev/null | grep -v "reliability-dash/scripts/cron_refresh.sh"; echo "$CRON_LINE") | crontab -
+echo "Cron refresh installed: $CRON_LINE"

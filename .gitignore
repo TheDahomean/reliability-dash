@@ -9,3 +9,12 @@ node_modules/
 .env
 .env.*
 *backup*
+
+# Local config and runtime artifacts
+.env.local
+.wrangler/
+logs/
+
+# Downloaded data artifacts
+latest_workbook.xlsx
+latest_sheet.csv
