@@ -1,0 +1,75 @@
+name: Refresh and deploy reliability dashboard
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  refresh-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          pip install openpyxl requests google-auth google-api-python-client 2>/dev/null || true
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Write service account key
+        run: echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}' > /tmp/sa.json
+
+      - name: Refresh data from Google Sheets
+        run: |
+          python3 refresh_dashboard.py \
+            --workbook-url "https://docs.google.com/spreadsheets/d/1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg/export?format=xlsx" \
+            --workbook-output latest_workbook.xlsx \
+            --incubation-csv-url "https://docs.google.com/spreadsheets/d/1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg/export?format=csv&gid=1179745250" \
+            --incubation-csv-output latest_sheet.csv \
+            --baseline-js-input data.js \
+            --request-timeout-seconds 60 \
+            --overall-timeout-seconds 300 \
+            --download-attempts 3 \
+            --retry-delay-seconds 10 \
+            --min-rows 150 \
+            --js-output data.js \
+            --service-account-json /tmp/sa.json
+
+      - name: Validate snapshot
+        run: python3 validate_snapshot.py data.js
+
+      - name: Build public reliability snapshot
+        run: python3 build_opsdash_public.py
+
+      - name: Prepare Pages bundle
+        run: |
+          mkdir -p pages-deploy/data
+          cp index.html pages-deploy/index.html
+          cp data.js pages-deploy/data.js
+          cp opsdash_status.json pages-deploy/opsdash_status.json
+          cp favicon.svg pages-deploy/favicon.svg
+          cp _headers pages-deploy/_headers
+          cp data/opsdash_snapshot.json pages-deploy/data/opsdash_snapshot.json
+          cp data/opsdash_snapshot_meta.json pages-deploy/data/opsdash_snapshot_meta.json
+
+      - name: Deploy public Reliability dashboard
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: 549ca24bcbb7ee6769c08e2516ac583b
+          command: pages deploy pages-deploy --project-name=opsdash-public --branch=main --commit-dirty=true
+
+      - name: Health check
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          import json, urllib.request
+          with urllib.request.urlopen("https://reliability.psfarms.co.ke/opsdash_status.json", timeout=15) as resp:
+              print(json.dumps(json.load(resp), indent=2))
+          PY

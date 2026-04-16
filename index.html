@@ -45,34 +45,6 @@
       min-height: 100vh;
     }
 
-    body.gate-locked {
-      overflow: hidden;
-    }
-
-    body.gate-locked .shell,
-    body.gate-locked .chart-tooltip {
-      display: none;
-    }
-
-    .access-gate {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background:
-        radial-gradient(circle at top left, rgba(13, 92, 73, 0.24), transparent 34%),
-        radial-gradient(circle at top right, rgba(229, 107, 47, 0.22), transparent 30%),
-        rgba(21, 15, 8, 0.68);
-      backdrop-filter: blur(10px);
-    }
-
-    body.gate-locked .access-gate {
-      display: flex;
-    }
-
     .access-panel {
       width: min(520px, 100%);
       padding: 28px;
@@ -265,11 +237,11 @@
     }
 
     .hero-main {
-      padding: 30px 30px 26px;
+      padding: 28px 30px 24px;
       position: relative;
       overflow: hidden;
       display: grid;
-      gap: 16px;
+      gap: 14px;
     }
 
     .hero-main::after {
@@ -303,8 +275,19 @@
       max-width: 62ch;
       margin: 0;
       color: #243127;
-      font-size: 1rem;
-      line-height: 1.55;
+      font-size: 0.98rem;
+      line-height: 1.5;
+    }
+
+    .hero-cadence {
+      max-width: 72ch;
+      margin: 2px 0 0;
+      padding: 10px 13px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(24, 32, 24, 0.10);
+      color: #1f2d21;
+      font: 600 0.9rem/1.4 Arial, sans-serif;
     }
 
     .hero-meta {
@@ -445,7 +428,7 @@
 
     .kpis {
       grid-template-columns: repeat(5, minmax(0, 1fr));
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
     .kpi {
@@ -467,6 +450,83 @@
     .kpi-note {
       color: var(--muted);
       font: 500 0.92rem/1.45 Arial, sans-serif;
+    }
+
+    .buyer-strip {
+      margin-bottom: 14px;
+      padding: 16px 18px;
+      display: grid;
+      gap: 14px;
+      border-top: 5px solid var(--accent);
+      background: rgba(255, 248, 238, 0.96);
+    }
+
+    .buyer-strip-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: baseline;
+      flex-wrap: wrap;
+    }
+
+    .buyer-strip-title {
+      margin: 0;
+      font: 700 1.1rem/1.2 Arial, sans-serif;
+      color: #1f2d21;
+    }
+
+    .buyer-strip-note {
+      max-width: 54ch;
+      color: var(--muted);
+      font: 500 0.88rem/1.45 Arial, sans-serif;
+    }
+
+    .buyer-strip-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .buyer-strip-block {
+      display: grid;
+      gap: 10px;
+    }
+
+    .buyer-strip-kicker {
+      margin: 0;
+      color: var(--muted);
+      font: 700 0.72rem/1.2 Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .allocation-grid,
+    .cutoff-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .allocation-item,
+    .cutoff-item {
+      display: grid;
+      gap: 3px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(24, 32, 24, 0.08);
+    }
+
+    .allocation-item strong,
+    .cutoff-item strong {
+      font: 700 0.9rem/1.25 Arial, sans-serif;
+      color: #1f2d21;
+    }
+
+    .allocation-item span,
+    .cutoff-item span {
+      color: #314033;
+      font: 500 0.86rem/1.4 Arial, sans-serif;
     }
 
     .decision-panels {
@@ -540,6 +600,145 @@
     }
 
     .decision-list-item::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      margin-top: 0.35rem;
+      border-radius: 999px;
+      background: rgba(13, 92, 73, 0.7);
+    }
+
+    .hero,
+    .hero-cadence,
+    .kpis,
+    .kpi,
+    .section {
+      scroll-margin-top: 28px;
+    }
+
+    .faq-section {
+      margin-bottom: 18px;
+    }
+
+    .faq-intro {
+      max-width: 72ch;
+      margin: 0 0 18px;
+      color: #314033;
+      font: 500 0.96rem/1.6 Arial, sans-serif;
+    }
+
+    .faq-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .faq-item {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+      padding: 18px 18px 16px;
+      border-radius: 20px;
+      background: rgba(255, 251, 246, 0.92);
+      border: 1px solid rgba(24, 32, 24, 0.10);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    }
+
+    .faq-question {
+      margin: 0;
+      color: #1e2a1f;
+      font: 700 1.05rem/1.35 Arial, sans-serif;
+    }
+
+    .faq-answer {
+      margin: 0;
+      color: #314033;
+      font: 500 0.94rem/1.55 Arial, sans-serif;
+    }
+
+    .faq-answer strong {
+      color: #1f2d21;
+      font-weight: 700;
+    }
+
+    .faq-refs {
+      display: grid;
+      gap: 10px;
+      padding-top: 2px;
+      border-top: 1px solid rgba(24, 32, 24, 0.08);
+    }
+
+    .faq-ref-label {
+      color: var(--muted);
+      font: 700 0.74rem/1.2 Arial, sans-serif;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .faq-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .faq-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(13, 92, 73, 0.08);
+      border: 1px solid rgba(13, 92, 73, 0.16);
+      color: #184c3d;
+      font: 700 0.8rem/1.2 Arial, sans-serif;
+      text-decoration: none;
+    }
+
+    .faq-link:hover,
+    .faq-link:focus-visible {
+      background: rgba(13, 92, 73, 0.14);
+    }
+
+    .trust-grid {
+      margin-bottom: 18px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .trust-card {
+      padding: 18px 20px;
+      border-top: 5px solid transparent;
+    }
+
+    .trust-card.stage-harvest { border-top-color: var(--harvest); }
+    .trust-card.stage-incubation { border-top-color: var(--incubation); }
+
+    .trust-title {
+      margin: 0 0 6px;
+      font: 700 1.18rem/1.2 Arial, sans-serif;
+      color: #1f2d21;
+    }
+
+    .trust-copy {
+      margin: 0 0 14px;
+      color: #314033;
+      font: 500 0.92rem/1.5 Arial, sans-serif;
+      max-width: 58ch;
+    }
+
+    .trust-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .trust-item {
+      display: grid;
+      grid-template-columns: 10px 1fr;
+      gap: 10px;
+      align-items: start;
+      color: #314033;
+      font: 500 0.9rem/1.45 Arial, sans-serif;
+    }
+
+    .trust-item::before {
       content: "";
       width: 10px;
       height: 10px;
@@ -635,6 +834,7 @@
     }
 
     .section.stage-incubation { border-top-color: var(--incubation); }
+    .section.stage-harvest { border-top-color: var(--harvest); }
     .section.stage-fruiting { border-top-color: var(--fruiting); }
     .section.stage-contamination { border-top-color: var(--contamination); }
 
@@ -1103,10 +1303,28 @@
       fill: #344037;
     }
 
+    @media print {
+      .faq-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .buyer-strip-grid,
+      .trust-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .faq-item {
+        break-inside: avoid;
+      }
+    }
+
     @media (max-width: 980px) {
       .hero,
+      .buyer-strip-grid,
       .support-grid,
       .decision-panels,
+      .faq-grid,
+      .trust-grid,
       .layout,
       .kpis,
       .yield-summary,
@@ -1125,131 +1343,334 @@
       .decision-inline-metrics {
         grid-template-columns: 1fr;
       }
+
+      .buyer-strip {
+        padding: 15px 16px;
+      }
+
+      .buyer-strip-head {
+        gap: 10px;
+      }
     }
   </style>
-  <noscript>
-    <style>
-      body.gate-locked {
-        overflow: auto !important;
-      }
-      body.gate-locked .shell,
-      body.gate-locked .chart-tooltip {
-        display: block !important;
-      }
-      body.gate-locked .access-gate {
-        display: none !important;
-      }
-    </style>
-  </noscript>
 </head>
-<body class="gate-locked">
-  <div class="access-gate" id="accessGate">
-    <div class="access-panel">
-      <p class="access-kicker">Protected Access</p>
-      <h1>PS Farms reliability dashboard</h1>
-      <p class="access-copy">
-        Enter the client password to view the customer-facing production reliability snapshot.
-      </p>
-      <form class="access-form" id="accessForm">
-        <label for="accessPassword">Password</label>
-        <input id="accessPassword" name="password" type="password" autocomplete="current-password" />
-        <button type="submit">Open dashboard</button>
-      </form>
-      <div class="access-error" id="accessError" aria-live="polite"></div>
-      <p class="access-note">Password entry is case-insensitive.</p>
-    </div>
-  </div>
+<body>
   
   <div class="shell">
-    <section class="hero">
+    <section class="hero" id="heroOverview">
       <div class="panel hero-main">
-        <p class="eyebrow">Procurement Reliability View</p>
-        <h1>What volume PS Farms can reliably supply, at what cadence, and with what risk.</h1>
+        <p class="eyebrow">Buyer Supply View</p>
+        <h1>What PS Farms can ship this week, what is likely next week, and how we protect your supply.</h1>
         <p class="hero-copy">
-          Procurement decision first. The first strip answers available-to-promise volume, weekly cadence, quality,
-          and service risk. Everything below exists only to support confidence in that promise.
+          Start with a weekly order plan. We show the conservative volume we can stand behind, the quality signal
+          behind it, and any current risk that could affect supply.
         </p>
-        <div class="hero-meta" id="hero-meta"><span class="tag">Harvest through 3 Apr 2026</span><span class="tag ">Snapshot refreshed just now</span><span class="tag">Snapshot EAT 3 Apr 2026, 8:18 PM | ET 3 Apr 2026, 1:18 PM</span></div>
+        <p class="hero-cadence" id="hero-cadence">Recommended start: begin with a repeat weekly order at 19.0 kg per week, then scale after clean delivery history.</p>
+        <div class="hero-meta" id="hero-meta"><span class="tag">Harvest through 14 Apr 2026</span><span class="tag ">Snapshot refreshed just now</span><span class="tag">Snapshot EAT 16 Apr 2026, 3:30 AM | ET 15 Apr 2026, 8:30 PM</span></div>
       </div>
     </section>
 
-    <section class="grid kpis" id="kpis"><article class="panel kpi stage-harvest"><p class="section-label">Available-to-promise kg (next 7 days)</p><div class="kpi-value">19.6 kg</div><div class="kpi-note">Risk-adjusted from the live fruiting run-rate, with only day-17+ pipeline pulled forward.</div></article><article class="panel kpi stage-fruiting"><p class="section-label">Available-to-promise kg (next 14 days)</p><div class="kpi-value">39.7 kg</div><div class="kpi-note">Adds a conservative share of day-13+ pipeline at 21.7 kg per 100 prepared bags.</div></article><article class="panel kpi stage-incubation"><p class="section-label">Minimum Reliable Weekly MOQ</p><div class="kpi-value">19.0 kg</div><div class="kpi-note">Set as the lower of recent shipped week and current next-7 ATP.</div></article><article class="panel kpi stage-harvest"><p class="section-label">Acceptance quality rate / rejection rate (recent)</p><div class="kpi-value">100.0% / 0.0%</div><div class="kpi-note">39.2 kg accepted in the last 14 days | 0.0 kg rejected.</div></article><article class="panel kpi stage-contamination"><p class="section-label">Service-risk flag</p><div class="kpi-value">High</div><div class="kpi-note">High because one live fruiting lot is carrying current shipments while 296 near-harvest bags remain on watch.</div></article></section>
+    <section class="grid kpis" id="kpis"><article class="panel kpi stage-harvest"><p class="section-label">Available-to-promise kg (next 7 days)</p><div class="kpi-value">11.9 kg</div><div class="kpi-note">Risk-adjusted from the live fruiting run-rate, with only day-17+ pipeline pulled forward.</div></article><article class="panel kpi stage-fruiting"><p class="section-label">Available-to-promise kg (next 14 days)</p><div class="kpi-value">14.8 kg</div><div class="kpi-note">Adds a conservative share of day-13+ pipeline at 35.6 kg per 100 prepared bags.</div></article><article class="panel kpi stage-incubation"><p class="section-label">Minimum Reliable Weekly MOQ</p><div class="kpi-value">11.9 kg</div><div class="kpi-note">Set as the lower of recent shipped week and current next-7 ATP.</div></article><article class="panel kpi stage-harvest"><p class="section-label">Acceptance quality rate / rejection rate (recent)</p><div class="kpi-value">100.0% / 0.0%</div><div class="kpi-note">22.8 kg accepted in the last 14 days | 0.0 kg rejected.</div></article><article class="panel kpi stage-harvest"><p class="section-label">Service-risk flag</p><div class="kpi-value">Low</div><div class="kpi-note">Low because multiple active watch flags are still open in the near-harvest pipeline.</div></article></section>
+
+    <section class="panel buyer-strip" id="orderingStrip">
+      <div class="buyer-strip-head">
+        <div>
+          <p class="section-label">Buyer Guide</p>
+          <h2 class="buyer-strip-title">How ordering works</h2>
+        </div>
+        <div class="buyer-strip-note">Reserve allocation first. Then work back from the delivery run and cutoff.</div>
+      </div>
+      <div class="buyer-strip-grid">
+        <div class="buyer-strip-block">
+          <p class="buyer-strip-kicker">Allocation</p>
+          <div class="allocation-grid">
+            <div class="allocation-item">
+              <strong>Tier A</strong>
+              <span>Reserve volume with prepay or deposit.</span>
+            </div>
+            <div class="allocation-item">
+              <strong>Tier B</strong>
+              <span>Guaranteed weekly supply with recurring forecast.</span>
+            </div>
+            <div class="allocation-item">
+              <strong>Tier C</strong>
+              <span>Spot orders from leftover stock only.</span>
+            </div>
+          </div>
+        </div>
+        <div class="buyer-strip-block">
+          <p class="buyer-strip-kicker">Order Cutoffs</p>
+          <div class="cutoff-grid">
+            <div class="cutoff-item">
+              <strong>Monday delivery</strong>
+              <span>Order by Saturday 12:00 PM.</span>
+            </div>
+            <div class="cutoff-item">
+              <strong>Wednesday delivery</strong>
+              <span>Order by Monday 12:00 PM.</span>
+            </div>
+            <div class="cutoff-item">
+              <strong>Saturday delivery</strong>
+              <span>Order by Wednesday 12:00 PM.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="grid decision-panels">
-      <article class="panel section stage-harvest">
+      <article class="panel section stage-harvest" id="decisionConsistency">
         <div class="section-head">
           <div>
-            <p class="section-label">Decision Support</p>
-            <h2>Recent harvest consistency</h2>
+            <p class="section-label">Buyer Readout</p>
+            <h2>Has supply been steady lately?</h2>
           </div>
-          <div class="section-note">Measures whether current harvest cadence is stable enough to support repeat purchase timing.</div>
+          <div class="section-note">Shows whether recent shipments have been steady enough to support repeat weekly buying.</div>
         </div>
-        <div class="decision-body" id="consistencyPanel"><div class="decision-highlight"><div class="decision-highlight-value">Stable</div><div class="decision-highlight-label">Recent harvest cadence</div></div><div class="decision-inline-metrics"><div class="decision-inline-card"><div class="decision-inline-value">2.7 kg</div><div class="decision-inline-label">7-day daily average</div></div><div class="decision-inline-card"><div class="decision-inline-value">16.6%</div><div class="decision-inline-label">7-day volatility</div></div></div><div class="decision-list"><div class="decision-list-item">39.2 kg shipped in the last 14 harvest days.</div><div class="decision-list-item">The last 7 days ranged from 2.0 kg to 3.5 kg per day.</div><div class="decision-list-item">Standard deviation is 0.5 kg per day, which reads as stable cadence.</div></div></div>
+        <div class="decision-body" id="consistencyPanel"><div class="decision-highlight"><div class="decision-highlight-value">Volatile</div><div class="decision-highlight-label">Recent harvest cadence</div></div><div class="decision-inline-metrics"><div class="decision-inline-card"><div class="decision-inline-value">1.8 kg</div><div class="decision-inline-label">7-day daily average</div></div><div class="decision-inline-card"><div class="decision-inline-value">60.5%</div><div class="decision-inline-label">7-day volatility</div></div></div><div class="decision-list"><div class="decision-list-item">22.8 kg shipped in the last 14 harvest days.</div><div class="decision-list-item">The last 7 days ranged from 0.5 kg to 3.2 kg per day.</div><div class="decision-list-item">Standard deviation is 1.1 kg per day, which reads as volatile cadence.</div></div></div>
       </article>
 
-      <article class="panel section stage-fruiting">
+      <article class="panel section stage-fruiting" id="decisionPipeline">
         <div class="section-head">
           <div>
-            <p class="section-label">Decision Support</p>
-            <h2>Current pipeline</h2>
+            <p class="section-label">Buyer Readout</p>
+            <h2>What’s already growing for next week?</h2>
           </div>
-          <div class="section-note">Shows what is already fruiting, what is near harvest, and what is still too early to count toward a procurement promise.</div>
+          <div class="section-note">Shows what is already producing, what is close enough to count now, and what is still too early to promise.</div>
         </div>
-        <div class="decision-body" id="pipelinePanel"><div class="decision-highlight"><div class="decision-highlight-value">1 live lot</div><div class="decision-highlight-label">Current shipment engine</div></div><div class="decision-inline-metrics"><div class="decision-inline-card"><div class="decision-inline-value">3 batches / 447 bags</div><div class="decision-inline-label">Day-13+ near harvest</div></div><div class="decision-inline-card"><div class="decision-inline-value">1 batches / 82 bags</div><div class="decision-inline-label">Too early for ATP</div></div></div><div class="decision-list"><div class="decision-list-item">19.0 kg harvested in the last 7 days from the live fruiting lot.</div><div class="decision-list-item">3 base batches are close enough to count conservatively in next-14 ATP.</div><div class="decision-list-item">316 bags from failed batches are excluded from the promise rather than treated as pending supply.</div></div></div>
+        <div class="decision-body" id="pipelinePanel"><div class="decision-highlight"><div class="decision-highlight-value">4 live lots</div><div class="decision-highlight-label">Current shipment engine</div></div><div class="decision-inline-metrics"><div class="decision-inline-card"><div class="decision-inline-value">6 batches / 0 bags</div><div class="decision-inline-label">Day-13+ near harvest</div></div><div class="decision-inline-card"><div class="decision-inline-value">3 batches / 0 bags</div><div class="decision-inline-label">Too early for ATP</div></div></div><div class="decision-list"><div class="decision-list-item">12.5 kg harvested in the last 7 days from the live fruiting lot.</div><div class="decision-list-item">6 base batches are close enough to count conservatively in next-14 ATP.</div><div class="decision-list-item">0 bags from failed batches are excluded from the promise rather than treated as pending supply.</div></div></div>
       </article>
 
-      <article class="panel section stage-contamination">
+      <article class="panel section stage-contamination" id="decisionRisk">
         <div class="section-head">
           <div>
-            <p class="section-label">Decision Support</p>
-            <h2>Supply risk summary</h2>
+            <p class="section-label">Buyer Readout</p>
+            <h2>What could reduce next week’s supply?</h2>
           </div>
-          <div class="section-note">Keeps the top three current threats to cadence visible without dragging raw exception detail into the hero area.</div>
+          <div class="section-note">Keeps the current supply threats visible without making a buyer read farm exception detail first.</div>
         </div>
-        <div class="decision-body" id="riskPanel"><div class="decision-highlight"><div class="decision-highlight-value">3 watch factors</div><div class="decision-highlight-label">Current supply risks</div></div><div class="decision-inline-metrics"><div class="decision-inline-card"><div class="decision-inline-value">296 bags</div><div class="decision-inline-label">Near-harvest on watch</div></div><div class="decision-inline-card"><div class="decision-inline-value">1</div><div class="decision-inline-label">Live lots carrying supply</div></div></div><div class="decision-list"><div class="decision-list-item">1 live fruiting lot is carrying current shipment cadence.</div><div class="decision-list-item">296 near-harvest bags are on smell or contamination watch before they can support the next promise window.</div><div class="decision-list-item">Latest fruiting note on 1 Apr 2026: Dying pins from some of the bags, Bacterial blotch infection..</div></div></div>
+        <div class="decision-body" id="riskPanel"><div class="decision-highlight"><div class="decision-highlight-value">0 watch factors</div><div class="decision-highlight-label">Current supply risks</div></div><div class="decision-inline-metrics"><div class="decision-inline-card"><div class="decision-inline-value">0 bags</div><div class="decision-inline-label">Near-harvest on watch</div></div><div class="decision-inline-card"><div class="decision-inline-value">4</div><div class="decision-inline-label">Live lots carrying supply</div></div></div><div class="decision-list"><div class="decision-list-item">No open risk factor is currently stronger than the baseline service assumptions.</div></div></div>
       </article>
 
-      <article class="panel section stage-incubation">
+      <article class="panel section stage-incubation" id="decisionConcentration">
         <div class="section-head">
           <div>
-            <p class="section-label">Decision Support</p>
-            <h2>Vendor stability summary</h2>
+            <p class="section-label">Buyer Readout</p>
+            <h2>How spread out is the current supply?</h2>
           </div>
-          <div class="section-note">Focuses only on vendor exposure that affects the next promise window, not a full operational vendor scorecard.</div>
+          <div class="section-note">Shows whether today’s promise is spread across the pipeline or leaning too hard on a narrow source.</div>
         </div>
-        <div class="decision-body" id="vendorStabilityPanel"><div class="decision-highlight"><div class="decision-highlight-value">Systemic watch</div><div class="decision-highlight-label">Vendor effect on current promise</div></div><div class="decision-inline-metrics"><div class="decision-inline-card"><div class="decision-inline-value">LK 272 bags</div><div class="decision-inline-label">Largest open exposure</div></div><div class="decision-inline-card"><div class="decision-inline-value">JG 188 bags</div><div class="decision-inline-label">Second-largest exposure</div></div></div><div class="decision-list"><div class="decision-list-item">LK and JG account for 89.3% of open pipeline bags that matter to the next promise window.</div><div class="decision-list-item">Current watch flags cut across LK, JG, VM, which points to room conditions rather than a single-vendor miss.</div><div class="decision-list-item">316 bags from failed batches remain excluded from ATP instead of inflating the vendor promise.</div></div></div>
+        <div class="decision-body" id="vendorStabilityPanel"><div class="decision-highlight"><div class="decision-highlight-value">1 active vendors</div><div class="decision-highlight-label">Vendor effect on current promise</div></div><div class="decision-inline-metrics"><div class="decision-inline-card"><div class="decision-inline-value">Unknown 0 bags</div><div class="decision-inline-label">Largest open exposure</div></div><div class="decision-inline-card"><div class="decision-inline-value">N/A 0 bags</div><div class="decision-inline-label">Second-largest exposure</div></div></div><div class="decision-list"><div class="decision-list-item">Unknown and N/A account for 0.0% of open pipeline bags that matter to the next promise window.</div><div class="decision-list-item">Unknown carries the largest share of open bags in the current promise window.</div><div class="decision-list-item">No excluded vendor failure is inflating the current ATP number.</div></div></div>
       </article>
     </section>
 
-    <article class="panel section stage-incubation">
+    <article class="panel section stage-harvest" id="qualityPromise">
+      <div class="section-head">
+        <div>
+          <p class="section-label">Buyer Trust</p>
+          <h2>Quality promise</h2>
+        </div>
+        <div class="section-note">Short, practical terms buyers can check at hand-off.</div>
+      </div>
+      <div class="decision-list">
+        <div class="decision-list-item">Delivered within 24 hours of harvest.</div>
+        <div class="decision-list-item">Inspect at hand-off.</div>
+        <div class="decision-list-item">Valid rejection codes: WET, BRUISED, &gt;24H.</div>
+        <div class="decision-list-item">Replacement stock within 24 to 48 hours.</div>
+      </div>
+    </article>
+
+    <article class="panel section faq-section" id="buyerFaq">
+      <div class="section-head">
+        <div>
+          <p class="section-label">Buyer FAQ</p>
+          <h2>How a buyer can verify the promise</h2>
+        </div>
+        <div class="section-note">Follow-up only. Use this after the first read if you want to check why the promise is being made.</div>
+      </div>
+      <p class="faq-intro">Use this after the top strip and buyer readout, not before them. The aim is to confirm what can ship, what is likely next, how to start, and what could still move supply.</p>
+      <div class="faq-grid">
+        <article class="faq-item">
+          <h3 class="faq-question">How do you show that production is consistent rather than occasional?</h3>
+          <p class="faq-answer">We show recent daily output and how much it moves day to day. The point is to show whether supply is steady enough for repeat buying, not whether one strong day happened.</p>
+          <div class="faq-refs">
+            <span class="faq-ref-label">See dashboard sections:</span>
+            <div class="faq-links">
+              <a class="faq-link" href="#decisionConsistency">Has supply been steady lately?</a>
+              <a class="faq-link" href="#decisionPipeline">What’s already growing for next week?</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="faq-item">
+          <h3 class="faq-question">How do you define what you can reliably supply?</h3>
+          <p class="faq-answer">We define reliable supply as a conservative promise, not a best-case estimate. Right now, the good starting weekly order shown is <strong id="faqWeeklyFloor">19.0 kg</strong>, based on what is already shipping and what is ready this week.</p>
+          <div class="faq-refs">
+            <span class="faq-ref-label">See dashboard sections:</span>
+            <div class="faq-links">
+              <a class="faq-link" href="#kpiWeeklyFloor">Good starting weekly order</a>
+              <a class="faq-link" href="#promiseBasisSection">What supports this promise</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="faq-item">
+          <h3 class="faq-question">Why do you show both next-7-day and next-14-day supply?</h3>
+          <p class="faq-answer">The next 7 days shows immediate cover. The next 14 days shows what can likely follow behind it if the near-harvest pipeline stays on track. Showing both helps buyers judge immediate supply and short-term continuity.</p>
+          <div class="faq-refs">
+            <span class="faq-ref-label">See dashboard sections:</span>
+            <div class="faq-links">
+              <a class="faq-link" href="#kpiAvailable7">Ready to ship this week</a>
+              <a class="faq-link" href="#kpiAvailable14">Likely next week</a>
+              <a class="faq-link" href="#decisionPipeline">What’s already growing for next week?</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="faq-item">
+          <h3 class="faq-question">How should a new buyer start?</h3>
+          <p class="faq-answer">Start with the weekly order level we are most comfortable repeating right now, then scale only after clean delivery history. The current recommended start shown is <strong id="faqStarterProgram">19.0 kg per week</strong>.</p>
+          <div class="faq-refs">
+            <span class="faq-ref-label">See dashboard sections:</span>
+            <div class="faq-links">
+              <a class="faq-link" href="#hero-cadence">Recommended start</a>
+              <a class="faq-link" href="#kpiWeeklyFloor">Good starting weekly order</a>
+              <a class="faq-link" href="#decisionConcentration">How spread out is the current supply?</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="faq-item">
+          <h3 class="faq-question">How do you show commercial quality, not just farm output?</h3>
+          <p class="faq-answer">We show accepted versus rejected product so the quality view stays tied to what a buyer would actually receive. Right now, the recent commercial quality view is <strong id="faqQualityView">100.0% accepted / 0.0% rejected</strong>.</p>
+          <div class="faq-refs">
+            <span class="faq-ref-label">See dashboard sections:</span>
+            <div class="faq-links">
+              <a class="faq-link" href="#kpiQuality">Accepted in the last 14 days</a>
+              <a class="faq-link" href="#qualityPromise">Quality promise</a>
+              <a class="faq-link" href="#yieldBridgeSection">Provenance and yield bridge</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="faq-item">
+          <h3 class="faq-question">How do you account for current supply risk?</h3>
+          <p class="faq-answer">We keep the current risks visible in the top layer so a buyer does not have to read operations notes first. Right now, the dashboard labels current supply risk as <strong id="faqServiceRisk">High</strong>.</p>
+          <div class="faq-refs">
+            <span class="faq-ref-label">See dashboard sections:</span>
+            <div class="faq-links">
+              <a class="faq-link" href="#kpiRisk">Current supply risk</a>
+              <a class="faq-link" href="#decisionRisk">What could reduce next week’s supply?</a>
+              <a class="faq-link" href="#decisionPipeline">What’s already growing for next week?</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="faq-item">
+          <h3 class="faq-question">How do you avoid overstating supply?</h3>
+          <p class="faq-answer">We count only the volume that is already producing or close enough to support the promise window conservatively. Early or impaired volume stays out of the promise until it is ready.</p>
+          <div class="faq-refs">
+            <span class="faq-ref-label">See dashboard sections:</span>
+            <div class="faq-links">
+              <a class="faq-link" href="#kpiAvailable7">Ready to ship this week</a>
+              <a class="faq-link" href="#kpiAvailable14">Likely next week</a>
+              <a class="faq-link" href="#promiseBasisSection">What supports this promise</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="faq-item">
+          <h3 class="faq-question">How spread out is the current promise?</h3>
+          <p class="faq-answer">The dashboard shows how much of the near-term promise depends on a narrow part of the current supply base. Right now, the top two supply lines account for <strong id="faqTopSupplierShare">89.3%</strong> of the near-term promise, so supply is still concentrated.</p>
+          <div class="faq-refs">
+            <span class="faq-ref-label">See dashboard sections:</span>
+            <div class="faq-links">
+              <a class="faq-link" href="#decisionConcentration">How spread out is the current supply?</a>
+              <a class="faq-link" href="#vendorDetailSection">Supplier detail behind the promise</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="faq-item">
+          <h3 class="faq-question">How should a buyer think about repeat weekly orders?</h3>
+          <p class="faq-answer">Think in terms of a repeat weekly order that can be delivered cleanly and repeated. It is about a safe weekly rhythm first, then scale after the pattern holds.</p>
+          <div class="faq-refs">
+            <span class="faq-ref-label">See dashboard sections:</span>
+            <div class="faq-links">
+              <a class="faq-link" href="#hero-cadence">Recommended start</a>
+              <a class="faq-link" href="#kpiWeeklyFloor">Good starting weekly order</a>
+              <a class="faq-link" href="#decisionConsistency">Has supply been steady lately?</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="faq-item">
+          <h3 class="faq-question">What should a buyer take away from the dashboard overall?</h3>
+          <p class="faq-answer">Use the top strip for what can ship now, the buyer readout for what is likely next, and the lower sections only if you want proof behind the promise. The practical takeaway is what PS Farms can ship, what looks safe to start with, and what current risk still needs watching.</p>
+          <div class="faq-refs">
+            <span class="faq-ref-label">See dashboard sections:</span>
+            <div class="faq-links">
+              <a class="faq-link" href="#heroOverview">Buyer supply view</a>
+              <a class="faq-link" href="#kpis">Top promise strip</a>
+              <a class="faq-link" href="#promiseBasisSection">What supports this promise</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </article>
+
+    <section class="grid trust-grid" id="commercialGuide">
+      <article class="panel trust-card stage-harvest">
+        <p class="section-label">Buyer Onboarding</p>
+        <h2 class="trust-title">Product lanes</h2>
+        <p class="trust-copy">Keep the pack style tied to how the product will be sold.</p>
+        <div class="trust-list">
+          <div class="trust-item"><strong>Labeled:</strong>&nbsp;retail, greengrocer, online.</div>
+          <div class="trust-item"><strong>Unlabeled:</strong>&nbsp;marketplace, broker, bulk.</div>
+        </div>
+      </article>
+
+      <article class="panel trust-card stage-incubation">
+        <p class="section-label">Buyer Onboarding</p>
+        <h2 class="trust-title">Fulfillment</h2>
+        <p class="trust-copy">Keep delivery terms simple and confirm them when allocation is locked.</p>
+        <div class="trust-list">
+          <div class="trust-item">Pickup follows the Monday, Wednesday, and Saturday delivery rhythm shown above.</div>
+          <div class="trust-item">Direct delivery threshold is confirmed by route before the first order goes live.</div>
+          <div class="trust-item">Any delivery fee is confirmed with the quote before shipment.</div>
+        </div>
+      </article>
+    </section>
+
+    <article class="panel section stage-incubation" id="promiseBasisSection">
       <div class="section-head">
         <div>
           <p class="section-label">Layer 3 Controls</p>
-          <h2>Batch drill-down and promise basis</h2>
+          <h2>What supports this promise</h2>
         </div>
-        <div class="section-note">Use this only after the top promise strip. It supports validation and provenance, not the initial procurement decision.</div>
+        <div class="section-note">Use this only after the top strip. It shows why the supply promise is being made, not a new promise.</div>
       </div>
       <div class="support-grid">
         <div class="support-controls">
           <div class="filter-block">
             <label for="batchFilter">Batch drill-down</label>
-            <select id="batchFilter"><option value="all" selected="selected">All batches</option><option value="SB-2026/01/27-01-ED">SB-2026/01/27-01-ED</option><option value="SB-2026/01/27-01-NM">SB-2026/01/27-01-NM</option><option value="SB-2026/02/05-02-ED">SB-2026/02/05-02-ED</option><option value="SB-2026/02/05-02-LK">SB-2026/02/05-02-LK</option><option value="SB-2026/02/05-02-NM">SB-2026/02/05-02-NM</option><option value="SB-2026/02/12-03-LK">SB-2026/02/12-03-LK</option><option value="SB-2026/02/19-04-NN">SB-2026/02/19-04-NN</option><option value="SB-2026/02/25-05-LK">SB-2026/02/25-05-LK</option><option value="SB-2026/02/25-05-NN">SB-2026/02/25-05-NN</option><option value="SB-2026/03/11-06-JG">SB-2026/03/11-06-JG</option><option value="SB-2026/03/11-06-LK">SB-2026/03/11-06-LK</option><option value="SB-2026/03/23-07-JG">SB-2026/03/23-07-JG</option><option value="SB-2026/03/23-07-LK">SB-2026/03/23-07-LK</option><option value="SB-2026/03/24-08-JG">SB-2026/03/24-08-JG</option><option value="SB-2026/03/24-08-LK">SB-2026/03/24-08-LK</option><option value="SB-2026/03/24-08-VM">SB-2026/03/24-08-VM</option><option value="SB-2026/03/31-09-LK">SB-2026/03/31-09-LK</option></select>
+            <select id="batchFilter"><option value="all" selected="selected">All batches</option><option value="SB-2026-09-04-11 LK  SB-2026-09-04-11 JG">SB-2026-09-04-11 LK  SB-2026-09-04-11 JG</option><option value="SB-2026/01/27-01-ED SB-2026/01/27-01-NM">SB-2026/01/27-01-ED SB-2026/01/27-01-NM</option><option value="SB-2026/02/05-02-ED SB-2026/02/05-02-NM SB-2026/02/05-02-LK">SB-2026/02/05-02-ED SB-2026/02/05-02-NM SB-2026/02/05-02-LK</option><option value="SB-2026/02/12-03-LK">SB-2026/02/12-03-LK</option><option value="SB-2026/02/19-04-NN">SB-2026/02/19-04-NN</option><option value="SB-2026/02/25-05">SB-2026/02/25-05</option><option value="SB-2026/02/25-05-LK SB-2026/02/25-05-NN">SB-2026/02/25-05-LK SB-2026/02/25-05-NN</option><option value="SB-2026/03/11-06-LK SB-2++026/03/11-06-JG">SB-2026/03/11-06-LK SB-2++026/03/11-06-JG</option><option value="SB-2026/03/11-06-LK SB-2026/03/11-06-JG">SB-2026/03/11-06-LK SB-2026/03/11-06-JG</option><option value="SB-2026/03/23-07  JG SB-2026/03/23-07 LK">SB-2026/03/23-07  JG SB-2026/03/23-07 LK</option><option value="SB-2026/03/24-08 VM SB-2026/03/24-08 JG SB-2026/03/24-08 LK">SB-2026/03/24-08 VM SB-2026/03/24-08 JG SB-2026/03/24-08 LK</option><option value="SB-2026/03/31-09 LK SB-2026/03/31-09G">SB-2026/03/31-09 LK SB-2026/03/31-09G</option><option value="SB-2026/04/04-10 LK">SB-2026/04/04-10 LK</option><option value="SB-2026/04/04-10 LK  SB-2026/04/04-10 JG">SB-2026/04/04-10 LK  SB-2026/04/04-10 JG</option></select>
           </div>
           <div class="control-note">The top promise metrics stay portfolio-wide. The selector changes only the layer-3 supporting detail below.</div>
-          <div class="focus-status" id="focusStatus"><span class="focus-chip muted">Portfolio promise: all batches</span><span class="focus-chip">Snapshot refreshed just now</span><span class="focus-chip muted">Build 0c9d854+dirty</span></div>
+          <div class="focus-status" id="focusStatus"><span class="focus-chip muted">Portfolio promise: all batches</span><span class="focus-chip">Snapshot refreshed just now</span><span class="focus-chip muted">Build 33716b0+dirty</span></div>
         </div>
         <div class="promise-method">
           <div class="promise-method-card">
-            <div class="promise-method-title">Promise Basis</div>
-            <div class="promise-method-copy">Next-7 ATP comes from the live fruiting run-rate only. Next-14 ATP adds a conservative share of day-13+ pipeline using realized kg per prepared bag.</div>
+            <div class="promise-method-title">What counts this week</div>
+            <div class="promise-method-copy">This week’s promise comes only from what is already producing. Next week adds only the part of the near-harvest pipeline that is close enough to count conservatively.</div>
           </div>
           <div class="promise-method-card">
-            <div class="promise-method-title">Cadence Rule</div>
-            <div class="promise-method-copy">Minimum reliable weekly MOQ is the lower of last week’s shipped volume and the current next-7 ATP.</div>
+            <div class="promise-method-title">How we size the start</div>
+            <div class="promise-method-copy">The good starting weekly order is the lower of last week’s shipped volume and what is ready to ship this week.</div>
           </div>
           <div class="promise-method-card">
-            <div class="promise-method-title">Confidence Rule</div>
-            <div class="promise-method-copy">Problem batches are excluded from ATP. Ops detail stays lower on the page as proof of control, not as the first story.</div>
+            <div class="promise-method-title">What stays out</div>
+            <div class="promise-method-copy">Any batch under watch stays out of the current promise until it recovers. These lower sections are here to prove restraint, not inflate supply.</div>
           </div>
         </div>
       </div>
@@ -1261,7 +1682,7 @@
           <p class="section-label">Layer 3 Drill-down</p>
           <h2>Selected batch summary</h2>
         </div>
-        <div class="section-note">Only appears when a batch is selected, so procurement readers can inspect provenance without losing the portfolio promise at the top.</div>
+        <div class="section-note">Only appears when a batch is selected, so buyers can inspect provenance without losing the portfolio promise at the top.</div>
       </div>
       <div class="yield-summary" id="focusedBatchSummary"></div>
       <div class="production-grid" id="focusedBatchCards"></div>
@@ -1275,11 +1696,11 @@
         </div>
         <div class="section-note">Shows prepared bag volume against the standard batch baseline so buyers can see how much substrate is actually behind the promise.</div>
       </div>
-      <div class="yield-summary" id="productionSummary"><article class="yield-summary-card stage-incubation"><p class="section-label">Bagging rows</p><div class="kpi-value">9</div><div class="kpi-note">1350 total bags filled across the latest snapshot.</div></article><article class="yield-summary-card stage-incubation"><p class="section-label">Pasteurization rows</p><div class="kpi-value">9</div><div class="kpi-note">Latest batch SB-2026/02/12-03.</div></article><article class="yield-summary-card stage-incubation"><p class="section-label">Bag-size mix</p><div class="kpi-value">4</div><div class="kpi-note">Distinct bagging targets observed in LOG 5.</div></article></div>
-      <div class="production-grid" id="productionCards"><article class="yield-card stage-incubation"><div class="yield-title">SB-2026/03/21-08 | 21 Mar 2026</div><div class="yield-note">Cottonhusk | 2 kg | critical limit met | disposition Normal.</div></article><article class="yield-card stage-incubation"><div class="yield-title">SB-2026/03/27-09 | 27 Mar 2026</div><div class="yield-note">Cottonhusk | 2 kg | critical limit met | disposition Normal.</div></article><article class="yield-card stage-incubation"><div class="yield-title">SB-2026/02/05-02 | 2 May 2026</div><div class="yield-note">Cottonhusk | 2 kg | critical limit met | disposition Normal.</div></article><article class="yield-card stage-incubation"><div class="yield-title">SB-2026/02/12-03 | 2 Dec 2026</div><div class="yield-note">Cottonhusk | 2 kg | critical limit met | disposition Normal.</div></article></div>
+      <div class="yield-summary" id="productionSummary"><article class="yield-summary-card stage-incubation"><p class="section-label">Bagging rows</p><div class="kpi-value">12</div><div class="kpi-note">1712 total bags filled across the latest snapshot.</div></article><article class="yield-summary-card stage-incubation"><p class="section-label">Pasteurization rows</p><div class="kpi-value">11</div><div class="kpi-note">Latest batch SB-2026/02/12-03.</div></article><article class="yield-summary-card stage-incubation"><p class="section-label">Bag-size mix</p><div class="kpi-value">4</div><div class="kpi-note">Distinct bagging targets observed in LOG 5.</div></article></div>
+      <div class="production-grid" id="productionCards"><article class="yield-card stage-incubation"><div class="yield-title">SB-2026/03/27-09 | 27 Mar 2026</div><div class="yield-note">Cottonhusk | 2 kg | critical limit met | disposition Normal.</div></article><article class="yield-card stage-incubation"><div class="yield-title">SB-2026/02/05-02 | 2 May 2026</div><div class="yield-note">Cottonhusk | 2 kg | critical limit met | disposition Normal.</div></article><article class="yield-card stage-incubation"><div class="yield-title">SB-2026/04/03-11 | 4 Sep 2026</div><div class="yield-note">Cottonhusk | 2 kg | critical limit met | disposition Normal.</div></article><article class="yield-card stage-incubation"><div class="yield-title">SB-2026/02/12-03 | 2 Dec 2026</div><div class="yield-note">Cottonhusk | 2 kg | critical limit met | disposition Normal.</div></article></div>
     </article>
 
-    <article class="panel section stage-fruiting">
+    <article class="panel section stage-fruiting" id="yieldBridgeSection">
       <div class="section-head">
         <div>
           <p class="section-label">Layer 3 Credibility</p>
@@ -1287,20 +1708,20 @@
         </div>
         <div class="section-note">Connects incubation, fruiting, and harvest records so the shipping promise can be traced back to physical lots.</div>
       </div>
-      <div class="yield-summary" id="yieldSummary"><article class="yield-summary-card stage-harvest"><p class="section-label">Harvest lots</p><div class="kpi-value">2</div><div class="kpi-note">Distinct harvest lots observed in the snapshot.</div></article><article class="yield-summary-card stage-fruiting"><p class="section-label">Fruiting lots</p><div class="kpi-value">1</div><div class="kpi-note">Distinct fruiting lots feeding the yield bridge.</div></article><article class="yield-summary-card stage-harvest"><p class="section-label">Latest harvest date</p><div class="kpi-value">3 Apr 2026</div><div class="kpi-note">2.25 kg harvested on the latest row.</div></article></div>
-      <div class="yield-grid" id="yieldBridge"><article class="yield-card stage-harvest"><div class="yield-title">FH-26/03/02-01 -&gt; FR-26-02/25-01</div><div class="yield-note">3.00 kg harvested | rejected 0.00 kg | strain Snow white...</div></article><article class="yield-card stage-harvest"><div class="yield-title">FH-26/03/02-01 -&gt; FR-26-02/25-01</div><div class="yield-note">3.50 kg harvested | rejected 0.00 kg | strain Snow white...</div></article><article class="yield-card stage-harvest"><div class="yield-title">FH-26/03/02-01 -&gt; FR-26-02/25-01</div><div class="yield-note">2.00 kg harvested | rejected 0.00 kg | strain Snow white...</div></article><article class="yield-card stage-harvest"><div class="yield-title">FH-26/03/02-01 -&gt; FR-26-02/25-01</div><div class="yield-note">2.75 kg harvested | rejected 0.00 kg | strain Snow white...</div></article><article class="yield-card stage-harvest"><div class="yield-title">FH-26/03/02/01 -&gt; FR-26-02/25-01</div><div class="yield-note">2.25 kg harvested | rejected 0.00 kg | strain Snow white...</div></article></div>
+      <div class="yield-summary" id="yieldSummary"><article class="yield-summary-card stage-harvest"><p class="section-label">Harvest lots</p><div class="kpi-value">3</div><div class="kpi-note">Distinct harvest lots observed in the snapshot.</div></article><article class="yield-summary-card stage-fruiting"><p class="section-label">Fruiting lots</p><div class="kpi-value">4</div><div class="kpi-note">Distinct fruiting lots feeding the yield bridge.</div></article><article class="yield-summary-card stage-harvest"><p class="section-label">Latest harvest date</p><div class="kpi-value">14 Apr 2026</div><div class="kpi-note">2.75 kg harvested on the latest row.</div></article></div>
+      <div class="yield-grid" id="yieldBridge"><article class="yield-card stage-harvest"><div class="yield-title">FH-26/04/02-01 -&gt; FR-26-02/25-01</div><div class="yield-note">0.50 kg harvested | rejected 0.00 kg | strain Snow white...</div></article><article class="yield-card stage-harvest"><div class="yield-title">FH26/04/02-01 -&gt; FR-26-02/25-01</div><div class="yield-note">1.00 kg harvested | rejected 0.00 kg | strain Snow white...</div></article><article class="yield-card stage-harvest"><div class="yield-title">FH26/04/02-01 -&gt; FR-26-02/25-01</div><div class="yield-note">3.00 kg harvested | rejected 0.00 kg | strain Snow white...</div></article><article class="yield-card stage-harvest"><div class="yield-title">FH26/04/02-01 -&gt; FR-26-02/25-01</div><div class="yield-note">3.25 kg harvested | rejected 0.00 kg | strain Snow white...</div></article><article class="yield-card stage-harvest"><div class="yield-title">FH26/04/02-01 -&gt; FR-26-02/25-01</div><div class="yield-note">2.75 kg harvested | rejected 0.00 kg | strain Snow white...</div></article></div>
     </article>
 
-    <article class="panel section stage-incubation">
+    <article class="panel section stage-incubation" id="vendorDetailSection">
       <div class="section-head">
         <div>
           <p class="section-label">Layer 3 Credibility</p>
-          <h2>Vendor performance snapshot detail</h2>
+          <h2>Source detail behind the promise</h2>
         </div>
-        <div class="section-note">Keeps vendor-level loss and alert detail below the promise strip, where it supports confidence instead of dominating the story.</div>
+        <div class="section-note">Keeps source-level exposure and watch detail below the promise strip, where it supports follow-up diligence instead of dominating the story.</div>
       </div>
-      <div class="yield-summary" id="vendorSummary"><article class="yield-summary-card stage-fruiting"><p class="section-label">Active vendors</p><div class="kpi-value">6</div><div class="kpi-note">Vendors derived from incubation batch suffixes.</div></article><article class="yield-summary-card stage-fruiting"><p class="section-label">Vendor with most rows</p><div class="kpi-value">LK</div><div class="kpi-note">By incubation row count in the current snapshot.</div></article><article class="yield-summary-card stage-fruiting"><p class="section-label">Row distribution</p><div class="kpi-value">ED: 42, JG: 11, LK: 46</div><div class="kpi-note">Top three vendor row counts.</div></article></div>
-      <div class="production-grid" id="vendorCards"><article class="yield-card stage-contamination"><div class="yield-title">LK</div><div class="yield-note">46 incubation rows | latest Moderate growth on 3 Apr 2026 | total removed 89.</div></article><article class="yield-card stage-contamination"><div class="yield-title">ED</div><div class="yield-note">42 incubation rows | latest Moderate growth on 4 Mar 2026 | total removed 15.</div></article><article class="yield-card stage-contamination"><div class="yield-title">NM</div><div class="yield-note">42 incubation rows | latest Moderate growth on 4 Mar 2026 | total removed 13.</div></article><article class="yield-card stage-contamination"><div class="yield-title">NN</div><div class="yield-note">12 incubation rows | latest Slow growth on 12 Mar 2026 | total removed 265.</div></article><article class="yield-card stage-contamination"><div class="yield-title">JG</div><div class="yield-note">11 incubation rows | latest Moderate growth on 3 Apr 2026 | total removed 9.</div></article><article class="yield-card stage-contamination"><div class="yield-title">VM</div><div class="yield-note">2 incubation rows | latest Moderate growth on 3 Apr 2026 | total removed 6.</div></article></div>
+      <div class="yield-summary" id="vendorSummary"><article class="yield-summary-card stage-fruiting"><p class="section-label">Active vendors</p><div class="kpi-value">1</div><div class="kpi-note">Vendors derived from incubation batch suffixes.</div></article><article class="yield-summary-card stage-fruiting"><p class="section-label">Vendor with most rows</p><div class="kpi-value">Unassigned</div><div class="kpi-note">By incubation row count in the current snapshot.</div></article><article class="yield-summary-card stage-fruiting"><p class="section-label">Row distribution</p><div class="kpi-value">Unassigned: 115</div><div class="kpi-note">Top three vendor row counts.</div></article></div>
+      <div class="production-grid" id="vendorCards"><article class="yield-card stage-contamination"><div class="yield-title">Unassigned</div><div class="yield-note">115 incubation rows | latest  growth on 15 Apr 2026 | total removed 498.</div></article></div>
     </article>
 
     <section class="grid layout">
@@ -1321,7 +1742,7 @@
             <span class="chart-legend-item"><span class="chart-dot ring-warn"></span> Smell alert</span>
             <span class="chart-legend-item"><span class="chart-dot dual-alert"></span> Visual alert + smell</span>
           </div>
-          <div class="chart-frame" id="timeline"><div class="snapshot-chart-list"><div class="snapshot-chart-item"><strong>SB-2026/03/11-06-JG</strong><div>3 Apr 2026 | Day 19 | Moderate growth</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/11-06-LK</strong><div>3 Apr 2026 | Day 19 | Moderate growth</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/23-07-JG</strong><div>3 Apr 2026 | Day 16 | Moderate growth</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/23-07-LK</strong><div>3 Apr 2026 | Day 16 | Moderate growth</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/24-08-JG</strong><div>3 Apr 2026 | Day 15 | Moderate growth</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/24-08-LK</strong><div>3 Apr 2026 | Day 15 | Moderate growth</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/24-08-VM</strong><div>3 Apr 2026 | Day 15 | Moderate growth</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/31-09-LK</strong><div>3 Apr 2026 | Day 5 | Moderate growth</div></div></div><p class="snapshot-static-note">Static snapshot fallback; interactive chart appears when JavaScript runs.</p></div>
+          <div class="chart-frame" id="timeline"><div class="snapshot-chart-list"><div class="snapshot-chart-item"><strong>SB-2026/02/25-05-LK SB-2026/02/25-05-NN</strong><div>12 Mar 2026 | Day 8 | Poor growth</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/11-06-LK SB-2++026/03/11-06-JG</strong><div>15 Apr 2026 | Day 31 |  growth</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/11-06-LK SB-2026/03/11-06-JG</strong><div>10 Apr 2026 | Day 26 | Slow growth</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/23-07  JG SB-2026/03/23-07 LK</strong><div>15 Apr 2026 | Day 0 |  growth</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/24-08 VM SB-2026/03/24-08 JG SB-2026/03/24-08 LK</strong><div>15 Apr 2026 | Day 0 |  growth</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/31-09 LK SB-2026/03/31-09G</strong><div>15 Apr 2026 | Day 0 |  growth</div></div><div class="snapshot-chart-item"><strong>SB-2026/04/04-10 LK</strong><div>6 Apr 2026 | Day 3 |  growth</div></div><div class="snapshot-chart-item"><strong>SB-2026/04/04-10 LK  SB-2026/04/04-10 JG</strong><div>15 Apr 2026 | Day 0 |  growth</div></div></div><p class="snapshot-static-note">Static snapshot fallback; interactive chart appears when JavaScript runs.</p></div>
         </article>
 
         <article class="panel section stage-incubation">
@@ -1332,7 +1753,7 @@
             </div>
             <div class="section-note">Removal spikes stay visible as supporting risk evidence, but they no longer lead the page.</div>
           </div>
-          <div class="chart-frame" id="removals"><div class="snapshot-chart-list"><div class="snapshot-chart-item"><strong>SB-2026/02/25-05-NN</strong><div>252 removed bag(s) through 12 Mar 2026</div></div><div class="snapshot-chart-item"><strong>SB-2026/02/25-05-LK</strong><div>66 removed bag(s) through 12 Mar 2026</div></div><div class="snapshot-chart-item"><strong>SB-2026/01/27-01-ED</strong><div>15 removed bag(s) through 4 Mar 2026</div></div><div class="snapshot-chart-item"><strong>SB-2026/02/19-04-NN</strong><div>13 removed bag(s) through 12 Mar 2026</div></div><div class="snapshot-chart-item"><strong>SB-2026/01/27-01-NM</strong><div>13 removed bag(s) through 4 Mar 2026</div></div><div class="snapshot-chart-item"><strong>SB-2026/02/12-03-LK</strong><div>12 removed bag(s) through 4 Mar 2026</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/11-06-LK</strong><div>6 removed bag(s) through 3 Apr 2026</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/24-08-VM</strong><div>6 removed bag(s) through 3 Apr 2026</div></div></div><p class="snapshot-static-note">Sorted by total removals within the latest snapshot.</p></div>
+          <div class="chart-frame" id="removals"><div class="snapshot-chart-list"><div class="snapshot-chart-item"><strong>SB-2026/02/25-05-LK SB-2026/02/25-05-NN</strong><div>318 removed bag(s) through 12 Mar 2026</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/11-06-LK SB-2++026/03/11-06-JG</strong><div>101 removed bag(s) through 15 Apr 2026</div></div><div class="snapshot-chart-item"><strong>SB-2026/01/27-01-ED SB-2026/01/27-01-NM</strong><div>28 removed bag(s) through 4 Mar 2026</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/24-08 VM SB-2026/03/24-08 JG SB-2026/03/24-08 LK</strong><div>15 removed bag(s) through 15 Apr 2026</div></div><div class="snapshot-chart-item"><strong>SB-2026/02/19-04-NN</strong><div>13 removed bag(s) through 12 Mar 2026</div></div><div class="snapshot-chart-item"><strong>SB-2026/02/12-03-LK</strong><div>12 removed bag(s) through 4 Mar 2026</div></div><div class="snapshot-chart-item"><strong>SB-2026/03/11-06-LK SB-2026/03/11-06-JG</strong><div>11 removed bag(s) through 10 Apr 2026</div></div></div><p class="snapshot-static-note">Sorted by total removals within the latest snapshot.</p></div>
         </article>
 
         <article class="panel section stage-harvest">
@@ -1344,7 +1765,7 @@
             <div class="section-note">Daily harvest detail underpins the ATP math shown at the top.</div>
           </div>
           <div class="yield-summary" id="harvestSummary"></div>
-          <div class="chart-frame" id="dailyHarvest"><div class="snapshot-chart-list"><div class="snapshot-chart-item"><strong>27 Mar 2026</strong><div>2.50 kg harvested</div></div><div class="snapshot-chart-item"><strong>28 Mar 2026</strong><div>2.75 kg harvested</div></div><div class="snapshot-chart-item"><strong>29 Mar 2026</strong><div>2.75 kg harvested</div></div><div class="snapshot-chart-item"><strong>30 Mar 2026</strong><div>3.00 kg harvested</div></div><div class="snapshot-chart-item"><strong>31 Mar 2026</strong><div>3.50 kg harvested</div></div><div class="snapshot-chart-item"><strong>1 Apr 2026</strong><div>2.00 kg harvested</div></div><div class="snapshot-chart-item"><strong>2 Apr 2026</strong><div>2.75 kg harvested</div></div><div class="snapshot-chart-item"><strong>3 Apr 2026</strong><div>2.25 kg harvested</div></div></div><p class="snapshot-static-note">Daily harvest totals from the committed local snapshot.</p></div>
+          <div class="chart-frame" id="dailyHarvest"><div class="snapshot-chart-list"><div class="snapshot-chart-item"><strong>7 Apr 2026</strong><div>1.50 kg harvested</div></div><div class="snapshot-chart-item"><strong>8 Apr 2026</strong><div>1.25 kg harvested</div></div><div class="snapshot-chart-item"><strong>9 Apr 2026</strong><div>0.75 kg harvested</div></div><div class="snapshot-chart-item"><strong>10 Apr 2026</strong><div>0.50 kg harvested</div></div><div class="snapshot-chart-item"><strong>11 Apr 2026</strong><div>1.00 kg harvested</div></div><div class="snapshot-chart-item"><strong>12 Apr 2026</strong><div>3.00 kg harvested</div></div><div class="snapshot-chart-item"><strong>13 Apr 2026</strong><div>3.25 kg harvested</div></div><div class="snapshot-chart-item"><strong>14 Apr 2026</strong><div>2.75 kg harvested</div></div></div><p class="snapshot-static-note">Daily harvest totals from the committed local snapshot.</p></div>
         </article>
       </div>
 
@@ -1357,7 +1778,7 @@
             </div>
             <div class="section-note">Current batch-by-batch view for validation and farm follow-up.</div>
           </div>
-          <div class="batch-cards" id="batchCards"><article class="batch-card stage-contamination"><header><div class="batch-title">SB-2026/03/11-06-JG</div><span class="pill">watch</span></header><div class="mini-stats"><div><strong>Day 19</strong> Latest incubation day</div><div><strong>0</strong> Removed on latest row</div><div><strong>3 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">No immediate note captured.</p></article><article class="batch-card stage-contamination"><header><div class="batch-title">SB-2026/03/11-06-LK</div><span class="pill">watch</span></header><div class="mini-stats"><div><strong>Day 19</strong> Latest incubation day</div><div><strong>0</strong> Removed on latest row</div><div><strong>3 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">No immediate note captured.</p></article><article class="batch-card stage-incubation"><header><div class="batch-title">SB-2026/03/23-07-JG</div><span class="pill">Moderate</span></header><div class="mini-stats"><div><strong>Day 16</strong> Latest incubation day</div><div><strong>0</strong> Removed on latest row</div><div><strong>3 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">The room temperature is okay reading 27⁰C Black Mold has been observed in some bags but the bags are still colonising</p></article><article class="batch-card stage-incubation"><header><div class="batch-title">SB-2026/03/23-07-LK</div><span class="pill">Moderate</span></header><div class="mini-stats"><div><strong>Day 16</strong> Latest incubation day</div><div><strong>0</strong> Removed on latest row</div><div><strong>3 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">The room temperature is okay reading 27⁰C Black Mold has been observed in some bags but the bags are still colonising</p></article><article class="batch-card stage-contamination"><header><div class="batch-title">SB-2026/03/24-08-JG</div><span class="pill">watch</span></header><div class="mini-stats"><div><strong>Day 15</strong> Latest incubation day</div><div><strong>4</strong> Removed on latest row</div><div><strong>3 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">15 bags of Verah are affected with green molds due to contamination with the spawns,we didn't realise earlier because mycelium had already colonised  making it difficult to detect the contamination.</p></article><article class="batch-card stage-contamination"><header><div class="batch-title">SB-2026/03/24-08-LK</div><span class="pill">watch</span></header><div class="mini-stats"><div><strong>Day 15</strong> Latest incubation day</div><div><strong>5</strong> Removed on latest row</div><div><strong>3 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">15 bags of Verah are affected with green molds due to contamination with the spawns,we didn't realise earlier because mycelium had already colonised  making it difficult to detect the contamination.</p></article><article class="batch-card stage-contamination"><header><div class="batch-title">SB-2026/03/24-08-VM</div><span class="pill">watch</span></header><div class="mini-stats"><div><strong>Day 15</strong> Latest incubation day</div><div><strong>6</strong> Removed on latest row</div><div><strong>3 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">15 bags of Verah are affected with green molds due to contamination with the spawns,we didn't realise earlier because mycelium had already colonised  making it difficult to detect the contamination.</p></article><article class="batch-card stage-incubation"><header><div class="batch-title">SB-2026/03/31-09-LK</div><span class="pill">Moderate</span></header><div class="mini-stats"><div><strong>Day 5</strong> Latest incubation day</div><div><strong>0</strong> Removed on latest row</div><div><strong>3 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">No immediate note captured.</p></article></div>
+          <div class="batch-cards" id="batchCards"><article class="batch-card stage-contamination"><header><div class="batch-title">SB-2026/02/25-05-LK SB-2026/02/25-05-NN</div><span class="pill">watch</span></header><div class="mini-stats"><div><strong>Day 8</strong> Latest incubation day</div><div><strong>314</strong> Removed on latest row</div><div><strong>12 Mar 2026</strong> Latest checkpoint</div></div><p class="focus-note">The entire batch had to be removed from the incubation room, to decontaminate and ensure proper clean up is to be done. This happened to avoid a reoccurrence of the same.</p></article><article class="batch-card stage-incubation"><header><div class="batch-title">SB-2026/03/11-06-LK SB-2++026/03/11-06-JG</div><span class="pill"></span></header><div class="mini-stats"><div><strong>Day 31</strong> Latest incubation day</div><div><strong>0</strong> Removed on latest row</div><div><strong>15 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">No immediate note captured.</p></article><article class="batch-card stage-contamination"><header><div class="batch-title">SB-2026/03/11-06-LK SB-2026/03/11-06-JG</div><span class="pill">watch</span></header><div class="mini-stats"><div><strong>Day 26</strong> Latest incubation day</div><div><strong>0</strong> Removed on latest row</div><div><strong>10 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">Mycelium growth is Slow but the bags are likely to produce</p></article><article class="batch-card stage-incubation"><header><div class="batch-title">SB-2026/03/23-07  JG SB-2026/03/23-07 LK</div><span class="pill"></span></header><div class="mini-stats"><div><strong>Day 0</strong> Latest incubation day</div><div><strong>0</strong> Removed on latest row</div><div><strong>15 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">No immediate note captured.</p></article><article class="batch-card stage-incubation"><header><div class="batch-title">SB-2026/03/24-08 VM SB-2026/03/24-08 JG SB-2026/03/24-08 LK</div><span class="pill"></span></header><div class="mini-stats"><div><strong>Day 0</strong> Latest incubation day</div><div><strong>0</strong> Removed on latest row</div><div><strong>15 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">No immediate note captured.</p></article><article class="batch-card stage-incubation"><header><div class="batch-title">SB-2026/03/31-09 LK SB-2026/03/31-09G</div><span class="pill"></span></header><div class="mini-stats"><div><strong>Day 0</strong> Latest incubation day</div><div><strong>0</strong> Removed on latest row</div><div><strong>15 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">No immediate note captured.</p></article><article class="batch-card stage-contamination"><header><div class="batch-title">SB-2026/04/04-10 LK</div><span class="pill">watch</span></header><div class="mini-stats"><div><strong>Day 3</strong> Latest incubation day</div><div><strong>0</strong> Removed on latest row</div><div><strong>6 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">Mycelium is not seen because the bags are black in colour</p></article><article class="batch-card stage-incubation"><header><div class="batch-title">SB-2026/04/04-10 LK  SB-2026/04/04-10 JG</div><span class="pill"></span></header><div class="mini-stats"><div><strong>Day 0</strong> Latest incubation day</div><div><strong>0</strong> Removed on latest row</div><div><strong>15 Apr 2026</strong> Latest checkpoint</div></div><p class="focus-note">No immediate note captured.</p></article></div>
         </article>
 
         <article class="panel section stage-contamination">
@@ -1368,55 +1789,24 @@
             </div>
             <div class="section-note">Raw exceptions remain available for credibility, but they no longer set the story on the first screen.</div>
           </div>
-          <div class="events" id="events"><div class="event-row"><div class="event-date">3 Apr 2026 | Day 19</div><div class="event-main">SB-2026/03/11-06-JG<div class="event-sub">No extra note captured.</div></div><div class="event-score">contamination</div></div><div class="event-row"><div class="event-date">3 Apr 2026 | Day 19</div><div class="event-main">SB-2026/03/11-06-LK<div class="event-sub">No extra note captured.</div></div><div class="event-score">contamination</div></div><div class="event-row"><div class="event-date">3 Apr 2026 | Day 16</div><div class="event-main">SB-2026/03/23-07-LK<div class="event-sub">The room temperature is okay reading 27⁰C Black Mold has been observed in some bags but the bags are still colonising</div></div><div class="event-score">Moderate</div></div><div class="event-row"><div class="event-date">3 Apr 2026 | Day 16</div><div class="event-main">SB-2026/03/23-07-JG<div class="event-sub">The room temperature is okay reading 27⁰C Black Mold has been observed in some bags but the bags are still colonising</div></div><div class="event-score">Moderate</div></div><div class="event-row"><div class="event-date">3 Apr 2026 | Day 15</div><div class="event-main">SB-2026/03/24-08-LK<div class="event-sub">15 bags of Verah are affected with green molds due to contamination with the spawns,we didn&#x27;t realise earlier because mycelium had already colonised  making it difficult to detect the contamination.</div></div><div class="event-score">contamination · 5 removed</div></div><div class="event-row"><div class="event-date">3 Apr 2026 | Day 15</div><div class="event-main">SB-2026/03/24-08-JG<div class="event-sub">15 bags of Verah are affected with green molds due to contamination with the spawns,we didn&#x27;t realise earlier because mycelium had already colonised  making it difficult to detect the contamination.</div></div><div class="event-score">contamination · 4 removed</div></div><div class="event-row"><div class="event-date">3 Apr 2026 | Day 15</div><div class="event-main">SB-2026/03/24-08-VM<div class="event-sub">15 bags of Verah are affected with green molds due to contamination with the spawns,we didn&#x27;t realise earlier because mycelium had already colonised  making it difficult to detect the contamination.</div></div><div class="event-score">contamination · 6 removed</div></div><div class="event-row"><div class="event-date">1 Apr 2026 | Day 17</div><div class="event-main">SB-2026/03/11-06-JG<div class="event-sub">There&#x27;s more heat due to the large number of bags in the room  temperature ranges 27.7⁰C  the stucked  bags temperature in between them is 33⁰C</div></div><div class="event-score">smell</div></div><div class="event-row"><div class="event-date">1 Apr 2026 | Day 17</div><div class="event-main">SB-2026/03/11-06-LK<div class="event-sub">There&#x27;s more heat due to the large number of bags in the room  temperature ranges 27.7⁰C  the stucked  bags temperature in between them is 33⁰C</div></div><div class="event-score">smell</div></div><div class="event-row"><div class="event-date">1 Apr 2026 | Day 14</div><div class="event-main">SB-2026/03/23-07-LK<div class="event-sub">No extra note captured.</div></div><div class="event-score">contamination</div></div></div>
+          <div class="events" id="events"><div class="event-row"><div class="event-date">13 Apr 2026 | Day 29</div><div class="event-main">SB-2026/03/11-06-LK SB-2++026/03/11-06-JG<div class="event-sub">mycelium growth is good and the bags will move to fruiting room</div></div><div class="event-score">contamination · smell · 101 removed</div></div><div class="event-row"><div class="event-date">13 Apr 2026 | Day 26</div><div class="event-main">SB-2026/03/23-07  JG SB-2026/03/23-07 LK<div class="event-sub">Mycelium growth is good, production should continue as planned</div></div><div class="event-score">Moderate</div></div><div class="event-row"><div class="event-date">13 Apr 2026 | Day 25</div><div class="event-main">SB-2026/03/24-08 VM SB-2026/03/24-08 JG SB-2026/03/24-08 LK<div class="event-sub">Mycelium growth is good  ,,room temperature is 27⁰C</div></div><div class="event-score">Good</div></div><div class="event-row"><div class="event-date">13 Apr 2026 | Day 15</div><div class="event-main">SB-2026/03/31-09 LK SB-2026/03/31-09G<div class="event-sub">Bags are well colonised,,</div></div><div class="event-score">Good</div></div><div class="event-row"><div class="event-date">13 Apr 2026 | Day 10</div><div class="event-main">SB-2026/04/04-10 LK  SB-2026/04/04-10 JG<div class="event-sub">Mycelium is not seened</div></div><div class="event-score"></div></div><div class="event-row"><div class="event-date">10 Apr 2026 | Day 26</div><div class="event-main">SB-2026/03/11-06-LK SB-2026/03/11-06-JG<div class="event-sub">Mycelium growth is Slow but the bags are likely to produce</div></div><div class="event-score">contamination · smell</div></div><div class="event-row"><div class="event-date">10 Apr 2026 | Day 23</div><div class="event-main">SB-2026/03/23-07  JG SB-2026/03/23-07 LK<div class="event-sub">The temperature is 27⁰C which is okay,,it&#x27;s the actual temperature</div></div><div class="event-score">Moderate</div></div><div class="event-row"><div class="event-date">10 Apr 2026 | Day 22</div><div class="event-main">SB-2026/03/24-08 VM SB-2026/03/24-08 JG SB-2026/03/24-08 LK<div class="event-sub">mycelium growth is good ,production should continue as planned</div></div><div class="event-score">Good</div></div><div class="event-row"><div class="event-date">10 Apr 2026 | Day 12</div><div class="event-main">SB-2026/03/31-09 LK SB-2026/03/31-09G<div class="event-sub">both bags are well colonised</div></div><div class="event-score">Good</div></div><div class="event-row"><div class="event-date">10 Apr 2026 | Day 7</div><div class="event-main">SB-2026/04/04-10 LK  SB-2026/04/04-10 JG<div class="event-sub">Mycelium is not seened due to the black bag</div></div><div class="event-score"></div></div></div>
         </article>
       </div>
     </section>
 
-    <p class="footer">Snapshot generated 2026-04-03T17:18:57.379229Z UTC from Google Sheets workbook 1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg. Build 0c9d854+dirty. Portfolio promise view. Row counts: bagging=9, pasteurization=9, incubation=155, fruiting=9, harvest=32.</p>
+    <p class="footer">Snapshot generated 2026-04-16T00:30:04.415566Z UTC from Google Sheets workbook 1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg. Build 33716b0+dirty. Portfolio promise view. Row counts: bagging=12, pasteurization=11, incubation=115, fruiting=17, harvest=42.</p>
   </div>
 
   <div class="chart-tooltip" id="chartTooltip"></div>
 
-  <script id="opsdashSnapshotMeta" type="application/json">{"build_version":"0c9d854+dirty","generated_at":"2026-04-03T17:18:57.379229Z","refresh_interval_minutes":15,"row_counts":{"bagging":9,"fruiting":9,"harvest":32,"incubation":155,"pasteurization":9},"selected_batch":"all","source_sheet":{"logs":{"bagging":"LOG 5","fruiting":"LOG 10 - Fruiting Room And Envi","harvest":"LOG 11 - Harvest (Ccp 2)","incubation":"LOG 9 - Incubation Daily Check","pasteurization":"LOG 6"},"spreadsheet_id":"1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg"},"source_type":"google_sheets_workbook_export"}</script>
+  <script id="opsdashSnapshotMeta" type="application/json">{"build_version":"33716b0+dirty","generated_at":"2026-04-16T00:30:04.415566Z","refresh_interval_minutes":15,"row_counts":{"bagging":12,"fruiting":17,"harvest":42,"incubation":115,"pasteurization":11},"selected_batch":"all","source_sheet":{"logs":{"bagging":"LOG 5","fruiting":"LOG 10 - Fruiting Room And Envi","harvest":"LOG 11 - Harvest (Ccp 2)","incubation":"LOG 9 - Incubation Daily Check","pasteurization":"LOG 6"},"spreadsheet_id":"1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg"},"source_type":"google_sheets_workbook_export"}</script>
   <script src="./data.js"></script>
   <script>
-    const VALID_PUBLIC_PASSWORDS = new Set(["zucchini", "cilantro", "citypark", "galleria"]);
-    const ACCESS_STORAGE_KEY = "opsdash-public-access-v3";
-
-    const accessFormEl = document.getElementById("accessForm");
-    const accessPasswordEl = document.getElementById("accessPassword");
-    const accessErrorEl = document.getElementById("accessError");
-
-    function unlockDashboard() {
-      window.localStorage.setItem(ACCESS_STORAGE_KEY, "granted");
-      document.body.classList.remove("gate-locked");
-      accessErrorEl.textContent = "";
-      accessPasswordEl.value = "";
-    }
-
-    function checkPassword(value) {
-      return VALID_PUBLIC_PASSWORDS.has(String(value || "").trim().toLowerCase());
-    }
-
-    if (window.localStorage.getItem(ACCESS_STORAGE_KEY) === "granted") {
-      unlockDashboard();
-    } else {
-      accessPasswordEl.focus();
-    }
-
-    accessFormEl.addEventListener("submit", (event) => {
-      event.preventDefault();
-      if (checkPassword(accessPasswordEl.value)) {
-        unlockDashboard();
-        return;
-      }
-      accessErrorEl.textContent = "Incorrect password. Please try again.";
-      accessPasswordEl.select();
-    });
-
     const snapshotMetaScriptEl = document.getElementById("opsdashSnapshotMeta");
-    const publicSnapshotMeta = snapshotMetaScriptEl ? JSON.parse(snapshotMetaScriptEl.textContent) : {};
+    const publicSnapshotMeta = (() => {
+      try { return snapshotMetaScriptEl ? JSON.parse(snapshotMetaScriptEl.textContent) : {}; }
+      catch (e) { console.error("Failed to parse snapshot meta:", e); return {}; }
+    })();
 
     function normalizeFruitingLotId(value) {
       return String(value || "").replace(/^FR-(\d{2})-(\d{2}\/\d{2}\/\d{2}-\d{2})$/, "FR-$1/$2");
@@ -1473,8 +1863,14 @@
 
     const filterEl = document.getElementById("batchFilter");
     const focusStatusEl = document.getElementById("focusStatus");
+    const heroCadenceEl = document.getElementById("hero-cadence");
     const heroMetaEl = document.getElementById("hero-meta");
     const kpisEl = document.getElementById("kpis");
+    const faqWeeklyFloorEl = document.getElementById("faqWeeklyFloor");
+    const faqStarterProgramEl = document.getElementById("faqStarterProgram");
+    const faqQualityViewEl = document.getElementById("faqQualityView");
+    const faqServiceRiskEl = document.getElementById("faqServiceRisk");
+    const faqTopSupplierShareEl = document.getElementById("faqTopSupplierShare");
     const consistencyPanelEl = document.getElementById("consistencyPanel");
     const pipelinePanelEl = document.getElementById("pipelinePanel");
     const riskPanelEl = document.getElementById("riskPanel");
@@ -2093,7 +2489,7 @@
       const serviceRisk = serviceRiskScore >= 4
         ? { level: "High", tone: "stage-contamination", multiplier: 0.82 }
         : serviceRiskScore >= 2
-          ? { level: "Med", tone: "stage-fruiting", multiplier: 0.90 }
+          ? { level: "Medium", tone: "stage-fruiting", multiplier: 0.90 }
           : { level: "Low", tone: "stage-harvest", multiplier: 0.95 };
       const issueMultiplier = activeFruitingIssueRow ? 0.92 : 1;
 
@@ -2140,16 +2536,21 @@
       const weeklyMoqKg = Math.min(available7Kg, recentHarvest7Kg || available7Kg);
 
       const riskFactors = [];
+      const shipmentEngineText = activeFruitingLots.length === 0
+        ? "no producing lots are supporting current shipments"
+        : activeFruitingLots.length === 1
+          ? "1 producing lot is supporting current shipments"
+          : `${activeFruitingLots.length} producing lots are supporting current shipments`;
       if (activeFruitingLots.length <= 1) {
-        riskFactors.push(`${activeFruitingLots.length || 0} live fruiting lot${activeFruitingLots.length === 1 ? "" : "s"} is carrying current shipment cadence.`);
+        riskFactors.push(`Current shipments are relying on a narrow part of the pipeline. Right now, ${shipmentEngineText}.`);
       }
       if (watchedNearHarvestBags > 0) {
-        riskFactors.push(`${watchedNearHarvestBags} near-harvest bags are on smell or contamination watch before they can support the next promise window.`);
+        riskFactors.push(`A meaningful share of next week’s supply is still under watch before we count it as promised. ${watchedNearHarvestBags} near-harvest bags are still being watched.`);
       }
       if (activeFruitingIssueRow) {
-        riskFactors.push(`Latest fruiting note on ${formatIsoDate(activeFruitingIssueRow.date)}: ${clipSentence(activeFruitingIssueRow.issuesObserved || activeFruitingIssueRow.actionTaken)}.`);
+        riskFactors.push(`A current growing-room issue could cut into next week’s supply. Latest note on ${formatIsoDate(activeFruitingIssueRow.date)}: ${clipSentence(activeFruitingIssueRow.issuesObserved || activeFruitingIssueRow.actionTaken)}.`);
       } else if (excludedEntries.length) {
-        riskFactors.push(`${excludedEntries.reduce((sum, entry) => sum + entry.preparedBags, 0)} prepared bags from failed batches are excluded from ATP rather than rolled forward.`);
+        riskFactors.push(`Some volume is staying out of the promise until it recovers. ${excludedEntries.reduce((sum, entry) => sum + entry.preparedBags, 0)} prepared bags are currently excluded.`);
       }
 
       const vendorExposure = new Map();
@@ -2164,17 +2565,12 @@
         });
       });
       const vendorExposureList = [...vendorExposure.entries()].sort((left, right) => right[1] - left[1]);
-      const currentPromiseVendors = vendorExposureList.map(([vendor]) => vendor);
       const topVendorExposure = vendorExposureList.slice(0, 2).reduce((sum, [, bags]) => sum + bags, 0);
-      const systemicVendorDriver = watchedVendorExposure.size >= 2
-        ? `Current watch flags cut across ${[...watchedVendorExposure.keys()].join(", ")}, which points to room conditions rather than a single-vendor miss.`
-        : currentPromiseVendors.length
-          ? `${currentPromiseVendors[0]} carries the largest share of open bags in the current promise window.`
-          : "No vendor-tagged open pipeline is available.";
-
       const serviceRiskDriver = activeFruitingLots.length <= 1
-        ? `${serviceRisk.level} because one live fruiting lot is carrying current shipments while ${watchedNearHarvestBags} near-harvest bags remain on watch.`
-        : `${serviceRisk.level} because multiple active watch flags are still open in the near-harvest pipeline.`;
+        ? `${serviceRisk.level}. Today’s promise is leaning on a narrow part of the pipeline.`
+        : serviceRisk.level === "Low"
+          ? `${serviceRisk.level}. Today’s promise is fairly well spread across the pipeline.`
+          : `${serviceRisk.level}. Some near-term supply is still under watch before we count it as promised.`;
 
       return {
         available7Kg,
@@ -2208,7 +2604,6 @@
         riskFactors: riskFactors.slice(0, 3),
         vendorExposureList,
         watchedVendorExposure,
-        systemicVendorDriver,
         topVendorExposure,
       };
     }
@@ -2220,6 +2615,7 @@
         ? `EAT ${fmtDateTimeNairobi.format(new Date(dashboardContext.generatedAt))} | ET ${fmtDateTimeEst.format(new Date(dashboardContext.generatedAt))}`
         : "unknown";
 
+      heroCadenceEl.textContent = `Recommended start: begin with a repeat weekly order at ${formatKg(model.weeklyMoqKg)} per week, then scale after clean delivery history.`;
       heroMetaEl.innerHTML = [
         `<span class="tag">Harvest through ${model.latestHarvestDateText ? formatIsoDate(model.latestHarvestDateText) : "N/A"}</span>`,
         `<span class="tag ${refreshHealth.tagClass}">${refreshHealth.heroText}</span>`,
@@ -2231,39 +2627,44 @@
       const model = buildReliabilityModel();
       const cards = [
         {
-          label: "Available-to-promise kg (next 7 days)",
+          id: "kpiAvailable7",
+          label: "Ready to ship this week",
           value: formatKg(model.available7Kg),
-          note: "Risk-adjusted from the live fruiting run-rate, with only day-17+ pipeline pulled forward.",
+          note: "This is the volume we believe we can pack and deliver in the next 7 days.",
           tone: "stage-harvest",
         },
         {
-          label: "Available-to-promise kg (next 14 days)",
+          id: "kpiAvailable14",
+          label: "Likely next week",
           value: formatKg(model.available14Kg),
-          note: `Adds a conservative share of day-13+ pipeline at ${(model.kgPerPreparedBag * 100).toFixed(1)} kg per 100 prepared bags.`,
+          note: "This adds the part of the pipeline that is close enough to harvest to count conservatively.",
           tone: "stage-fruiting",
         },
         {
-          label: "Minimum Reliable Weekly MOQ",
+          id: "kpiWeeklyFloor",
+          label: "Good starting weekly order",
           value: formatKg(model.weeklyMoqKg),
-          note: "Set as the lower of recent shipped week and current next-7 ATP.",
+          note: "This is the weekly order size we are most comfortable repeating right now.",
           tone: "stage-incubation",
         },
         {
-          label: "Acceptance quality rate / rejection rate (recent)",
+          id: "kpiQuality",
+          label: "Accepted in the last 14 days",
           value: `${formatPct(model.acceptanceRate)} / ${formatPct(model.rejectionRate)}`,
-          note: `${formatKg(model.recentAccepted14Kg)} accepted in the last 14 days | ${formatKg(model.recentRejected14Kg)} rejected.`,
+          note: "Recent accepted kilos versus rejected kilos. This is our cleanest quality signal.",
           tone: model.rejectionRate > 2 ? "stage-contamination" : "stage-harvest",
         },
         {
-          label: "Service-risk flag",
+          id: "kpiRisk",
+          label: "Current supply risk",
           value: model.serviceRisk.level,
-          note: model.serviceRiskDriver,
+          note: "Shows whether today’s promise is well spread out or leaning too heavily on a narrow part of the pipeline.",
           tone: model.serviceRisk.tone,
         },
       ];
 
       kpisEl.innerHTML = cards.map((card) => `
-        <article class="panel kpi ${card.tone}">
+        <article class="panel kpi ${card.tone}" id="${card.id}">
           <p class="section-label">${card.label}</p>
           <div class="kpi-value">${card.value}</div>
           <div class="kpi-note">${card.note}</div>
@@ -2271,67 +2672,100 @@
       `).join("");
     }
 
+    function buildBuyerFaq() {
+      const model = buildReliabilityModel();
+      const currentVendorTotal = model.vendorExposureList.reduce((sum, [, bags]) => sum + bags, 0);
+      const topVendorShare = currentVendorTotal ? (model.topVendorExposure / currentVendorTotal) * 100 : 0;
+
+      if (faqWeeklyFloorEl) {
+        faqWeeklyFloorEl.textContent = formatKg(model.weeklyMoqKg);
+      }
+      if (faqStarterProgramEl) {
+        faqStarterProgramEl.textContent = `${formatKg(model.weeklyMoqKg)} per week`;
+      }
+      if (faqQualityViewEl) {
+        faqQualityViewEl.textContent = `${formatPct(model.acceptanceRate)} accepted / ${formatPct(model.rejectionRate)} rejected`;
+      }
+      if (faqServiceRiskEl) {
+        faqServiceRiskEl.textContent = model.serviceRisk.level;
+      }
+      if (faqTopSupplierShareEl) {
+        faqTopSupplierShareEl.textContent = formatPct(topVendorShare);
+      }
+    }
+
     function buildDecisionPanels() {
       const model = buildReliabilityModel();
       const excludedBags = model.excludedEntries.reduce((sum, context) => sum + context.preparedBags, 0);
       const topRiskBullets = model.riskFactors.length ? model.riskFactors : ["No open risk factor is currently stronger than the baseline service assumptions."];
       const leadVendor = model.vendorExposureList[0] || ["N/A", 0];
-      const secondVendor = model.vendorExposureList[1] || ["N/A", 0];
       const currentVendorTotal = model.vendorExposureList.reduce((sum, [, bags]) => sum + bags, 0);
+      const leadVendorShare = currentVendorTotal ? (leadVendor[1] / currentVendorTotal) * 100 : 0;
       const topVendorShare = currentVendorTotal ? (model.topVendorExposure / currentVendorTotal) * 100 : 0;
+      const concentrationLabel = currentVendorTotal
+        ? (topVendorShare >= 80 ? "Narrow right now" : topVendorShare >= 60 ? "Some spread" : "Well spread")
+        : "Limited view";
+      const watchSupplierCount = model.watchedVendorExposure.size;
+      const starterProgramContext = topVendorShare >= 60 || model.activeFruitingLots.length <= 1
+        ? "while the current supply is still concentrated"
+        : "before scaling up";
       const recentDaily7Values = model.recentDaily7.map((entry) => entry.harvestedKg);
       const recentDailyLow = recentDaily7Values.length ? Math.min(...recentDaily7Values) : 0;
       const recentDailyHigh = recentDaily7Values.length ? Math.max(...recentDaily7Values) : 0;
 
       consistencyPanelEl.innerHTML = decisionPanelMarkup(
         model.consistencyLabel,
-        "Recent harvest cadence",
+        "Recent shipment rhythm",
         [
           decisionInlineMetric(formatKg(model.averageDaily7), "7-day daily average"),
           decisionInlineMetric(formatPct(model.volatility7 * 100), "7-day volatility"),
         ],
         [
-          `${formatKg(model.recentHarvest14Kg)} shipped in the last 14 harvest days.`,
-          `The last 7 days ranged from ${formatKg(recentDailyLow)} to ${formatKg(recentDailyHigh)} per day.`,
-          `Standard deviation is ${formatKg(model.deviationDaily7)} per day, which reads as ${model.consistencyLabel.toLowerCase()} cadence.`,
+          `${formatKg(model.recentHarvest14Kg)} delivered in the last 14 days.`,
+          `Daily output over the last 7 days ranged from ${formatKg(recentDailyLow)} to ${formatKg(recentDailyHigh)} per day.`,
+          `Day-to-day variation is ${formatKg(model.deviationDaily7)}, which supports a ${model.consistencyLabel.toLowerCase()} weekly shipment rhythm.`,
         ],
       );
 
       pipelinePanelEl.innerHTML = decisionPanelMarkup(
-        `${model.activeFruitingLots.length} live lot${model.activeFruitingLots.length === 1 ? "" : "s"}`,
-        "Current shipment engine",
+        `${model.activeFruitingLots.length} producing lot${model.activeFruitingLots.length === 1 ? "" : "s"}`,
+        "Supply already in motion",
         [
-          decisionInlineMetric(`${model.nearHarvestEntries.length} batches / ${model.nearHarvestBags} bags`, "Day-13+ near harvest"),
-          decisionInlineMetric(`${model.earlyPipelineEntries.length} batches / ${model.earlyPipelineBags} bags`, "Too early for ATP"),
+          decisionInlineMetric(`${model.nearHarvestEntries.length} batches / ${model.nearHarvestBags} bags`, "Close enough to count for next week"),
+          decisionInlineMetric(`${model.earlyPipelineEntries.length} batches / ${model.earlyPipelineBags} bags`, "Still too early to promise"),
         ],
         [
-          `${formatKg(model.recentHarvest7Kg)} harvested in the last 7 days from the live fruiting lot.`,
-          `${model.nearHarvestEntries.length} base batches are close enough to count conservatively in next-14 ATP.`,
-          `${excludedBags} bags from failed batches are excluded from the promise rather than treated as pending supply.`,
+          `${formatKg(model.recentHarvest7Kg)} harvested in the last 7 days from the currently producing lot.`,
+          `${model.nearHarvestEntries.length} growing batches are close enough to support next week’s view conservatively.`,
+          `${excludedBags} excluded bags stay out of the promise until recovered; they are not being counted as pending supply.`,
         ],
       );
 
       riskPanelEl.innerHTML = decisionPanelMarkup(
-        `${topRiskBullets.length} watch factor${topRiskBullets.length === 1 ? "" : "s"}`,
-        "Current supply risks",
+        `${topRiskBullets.length} thing${topRiskBullets.length === 1 ? "" : "s"} to watch`,
+        "Current supply pressure",
         [
-          decisionInlineMetric(`${model.watchedNearHarvestBags} bags`, "Near-harvest on watch"),
-          decisionInlineMetric(`${model.activeFruitingLots.length}`, "Live lots carrying supply"),
+          decisionInlineMetric(`${model.watchedNearHarvestBags} bags`, "Still under watch"),
+          decisionInlineMetric(`${model.activeFruitingLots.length}`, "Producing lots in shipment window"),
         ],
         topRiskBullets,
       );
 
       vendorStabilityPanelEl.innerHTML = decisionPanelMarkup(
-        model.watchedVendorExposure.size >= 2 ? "Systemic watch" : `${model.vendorExposureList.length} active vendors`,
-        "Vendor effect on current promise",
+        concentrationLabel,
+        "How today’s promise is spread",
         [
-          decisionInlineMetric(`${leadVendor[0]} ${leadVendor[1]} bags`, "Largest open exposure"),
-          decisionInlineMetric(`${secondVendor[0]} ${secondVendor[1]} bags`, "Second-largest exposure"),
+          decisionInlineMetric(formatPct(leadVendorShare), "Largest supply line"),
+          decisionInlineMetric(formatPct(topVendorShare), "Top two supply lines"),
         ],
         [
-          `${leadVendor[0]} and ${secondVendor[0]} account for ${formatPct(topVendorShare)} of open pipeline bags that matter to the next promise window.`,
-          model.systemicVendorDriver,
-          excludedBags ? `Historical failed-batch volume remains excluded from ATP instead of inflating the vendor promise.` : "No excluded vendor failure is inflating the current ATP number.",
+          `${formatPct(topVendorShare)} of the near-term promise currently sits with the top two supply lines, so the promise is not broadly spread yet.`,
+          watchSupplierCount >= 2
+            ? `Current watch flags touch ${watchSupplierCount} supply lines, which suggests the risk is not isolated to one line.`
+            : watchSupplierCount === 1
+              ? "Current watch flags are concentrated in one supply line rather than spread across the base."
+              : "No current supply-line watch flags are active in the near-term promise window.",
+          `Recommended start: ${formatKg(model.weeklyMoqKg)} per week ${starterProgramContext}.`,
         ],
       );
     }
@@ -2973,6 +3407,7 @@
       renderFocusStatus();
       buildHeroMeta();
       buildKpis();
+      buildBuyerFaq();
       buildDecisionPanels();
       buildFocusedBatchSummary(rows);
       buildProductionBridge();
@@ -2991,6 +3426,7 @@
       renderFocusStatus();
       buildHeroMeta();
       buildKpis();
+      buildBuyerFaq();
       buildDecisionPanels();
     }, 60000);
   </script>

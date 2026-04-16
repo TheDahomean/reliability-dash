@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-03T17:18:57.379229Z",
+  "generated_at": "2026-04-16T00:30:04.415566Z",
   "source_type": "google_sheets_workbook_export",
   "source_sheet": {
     "spreadsheet_id": "1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg",
@@ -12,13 +12,13 @@
     }
   },
   "row_counts": {
-    "bagging": 9,
-    "pasteurization": 9,
-    "incubation": 155,
-    "fruiting": 9,
-    "harvest": 32
+    "bagging": 12,
+    "pasteurization": 11,
+    "incubation": 115,
+    "fruiting": 17,
+    "harvest": 42
   },
   "selected_batch": "all",
-  "build_version": "0c9d854+dirty",
+  "build_version": "33716b0+dirty",
   "refresh_interval_minutes": 15
 }
