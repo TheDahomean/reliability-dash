@@ -3,6 +3,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
+BUNDLE_DIR="$ROOT/pages-deploy"
 
 for env_file in "$ROOT/.env.local" "$ROOT/.env"; do
   if [[ -f "$env_file" ]]; then
@@ -29,12 +30,12 @@ echo "[$(timestamp)] refresh_dashboard started"
   --workbook-output "$ROOT/latest_workbook.xlsx" \
   --incubation-csv-url "$INCUBATION_CSV_URL" \
   --incubation-csv-output "$ROOT/latest_sheet.csv" \
-  --baseline-js-input "$ROOT/data.js" \
+  --baseline-js-input "$BUNDLE_DIR/data.js" \
   --request-timeout-seconds 180 \
   --overall-timeout-seconds 900 \
   --download-attempts 3 \
   --retry-delay-seconds 5 \
   --min-rows 150 \
-  --js-output "$ROOT/data.js"
+  --js-output "$BUNDLE_DIR/data.js"
 
 echo "[$(timestamp)] refresh_dashboard completed"

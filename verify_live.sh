@@ -9,10 +9,10 @@ export PATH="${PATH}:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/s
 ROOT_HTML="$(curl --max-time 15 --retry 4 --retry-delay 1 --retry-all-errors -sS "$LIVE_URL/")"
 STATUS_JSON="$(curl --max-time 15 --retry 4 --retry-delay 1 --retry-all-errors -sS "$LIVE_URL/opsdash_status.json")"
 
-echo "$STATUS_JSON" | grep -q '"ok": true'
-echo "$ROOT_HTML" | grep -q 'Buyer FAQ'
-echo "$ROOT_HTML" | grep -q 'How do you define what you can reliably supply'
-echo "$ROOT_HTML" | grep -q 'What should a buyer take away from the dashboard overall'
+grep -q '"ok": true' <<< "$STATUS_JSON"
+grep -q 'Buyer FAQ' <<< "$ROOT_HTML"
+grep -q 'How do you define what you can reliably supply' <<< "$ROOT_HTML"
+grep -q 'What should a buyer take away from the dashboard overall' <<< "$ROOT_HTML"
 
 STATUS_FILE="$(mktemp "${TMPDIR:-/tmp}/reliability-status.XXXXXX.json")"
 cleanup() {

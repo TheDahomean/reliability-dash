@@ -8,8 +8,8 @@ python3 build_opsdash_public.py
 ./refresh_and_deploy.sh
 ./deploy_pages.sh
 ./verify_live.sh
-python3 validate_snapshot.py data.js
-python3 scripts/check_snapshot_freshness.py --status-json opsdash_status.json
+python3 validate_snapshot.py pages-deploy/data.js
+python3 scripts/check_snapshot_freshness.py --status-json pages-deploy/opsdash_status.json
 python3 -m http.server 8080
 ./scripts/refresher.sh
 ./scripts/codex_bootstrap.sh
@@ -24,14 +24,14 @@ Refresh flow:
 ```text
 Google Sheets workbook export / Sheets API
   -> refresh_dashboard.py
-  -> data.js
+  -> pages-deploy/data.js
   -> build_opsdash_public.py
-  -> index.html + opsdash_status.json + data snapshot files
+  -> pages-deploy/index.html + pages-deploy/opsdash_status.json + pages-deploy/data snapshot files
   -> deploy_pages.sh
   -> Cloudflare Pages
 ```
 
-`index.template.html` is the source template. `index.html` is the generated artifact that gets deployed.
+`index.template.html` is the source template. `pages-deploy/` is the generated artifact bundle that gets deployed.
 
 ## Environment
 
@@ -54,6 +54,6 @@ Local cron helper: `scripts/cron_refresh.sh`, which now runs `refresh_and_deploy
 
 ## Deploy safety
 
-- `refresh_and_deploy.sh` falls back to the last valid local `data.js` only if `validate_snapshot.py` passes.
-- `deploy_pages.sh` deploys only the public bundle files via a temporary staging directory.
-- The public HTML loads immediately with no password gate.
+- `refresh_and_deploy.sh` falls back to the last valid local `pages-deploy/data.js` only if `validate_snapshot.py` passes.
+- `deploy_pages.sh` deploys the generated `pages-deploy/` bundle directly.
+- The public HTML is protected by the client-side password gate currently committed on this branch.

@@ -10,15 +10,15 @@ from collections import defaultdict
 from typing import Any
 
 ROOT = pathlib.Path(__file__).resolve().parent
-PUBLIC_DIR = ROOT
+PUBLIC_DIR = ROOT / "pages-deploy"
 TEMPLATE_PATH = ROOT / "index.template.html"
-OUTPUT_HTML_PATH = ROOT / "index.html"
-ROOT_DATA_JS_PATH = ROOT / "data.js"
-PUBLIC_DATA_JS_PATH = ROOT / "data.js"
+OUTPUT_HTML_PATH = PUBLIC_DIR / "index.html"
+DATA_JS_PATH = PUBLIC_DIR / "data.js"
 SNAPSHOT_DIR = PUBLIC_DIR / "data"
 SNAPSHOT_PATH = SNAPSHOT_DIR / "opsdash_snapshot.json"
 SNAPSHOT_META_PATH = SNAPSHOT_DIR / "opsdash_snapshot_meta.json"
 STATUS_PATH = PUBLIC_DIR / "opsdash_status.json"
+STATIC_ASSET_PATHS = ("favicon.svg", "_headers")
 
 REFRESH_INTERVAL_MINUTES = 15
 STALE_WARNING_MINUTES = REFRESH_INTERVAL_MINUTES * 3
@@ -994,9 +994,7 @@ def build_public_site() -> None:
         raise SystemExit(f"Template missing: {TEMPLATE_PATH}")
 
     SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
-    if ROOT_DATA_JS_PATH.resolve() != PUBLIC_DATA_JS_PATH.resolve():
-        shutil.copy2(ROOT_DATA_JS_PATH, PUBLIC_DATA_JS_PATH)
-    context = load_context_from_data_js(ROOT_DATA_JS_PATH)
+    context = load_context_from_data_js(DATA_JS_PATH)
     version = build_version()
     meta, sections = build_public_payload(context, version)
 
@@ -1016,6 +1014,10 @@ def build_public_site() -> None:
     if any(token in output for token in REQUIRED_PLACEHOLDERS):
         raise SystemExit("Snapshot build failed: unresolved template placeholders remain.")
     OUTPUT_HTML_PATH.write_text(output, encoding="utf-8")
+    for asset_name in STATIC_ASSET_PATHS:
+        asset_path = ROOT / asset_name
+        if asset_path.exists():
+            shutil.copy2(asset_path, PUBLIC_DIR / asset_name)
 
 
 def main() -> int:

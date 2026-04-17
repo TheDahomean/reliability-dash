@@ -335,8 +335,8 @@ def main() -> int:
     )
     parser.add_argument(
         "--js-output",
-        default="data.js",
-        help="Dashboard data payload output path. Defaults to data.js.",
+        default="pages-deploy/data.js",
+        help="Dashboard data payload output path. Defaults to pages-deploy/data.js.",
     )
     parser.add_argument(
         "--incubation-csv-url",

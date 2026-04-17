@@ -1,6 +1,7 @@
 #!/bin/zsh
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
+BUNDLE_DIR="$ROOT/pages-deploy"
 
 for env_file in "$ROOT/.env.local" "$ROOT/.env"; do
   if [[ -f "$env_file" ]]; then
@@ -28,7 +29,7 @@ if /bin/zsh "$ROOT/refresh_dashboard.sh"; then
 else
   echo "[$(timestamp)] refresh step failed; checking for usable snapshot" >&2
   REFRESH_STATUS="FAILED"
-  if [[ -f "$ROOT/data.js" ]] && /usr/bin/python3 "$ROOT/validate_snapshot.py" "$ROOT/data.js" 2>/dev/null; then
+  if [[ -f "$BUNDLE_DIR/data.js" ]] && /usr/bin/python3 "$ROOT/validate_snapshot.py" "$BUNDLE_DIR/data.js" 2>/dev/null; then
     echo "[$(timestamp)] valid stale snapshot found; proceeding with deploy using cached data" >&2
     STALE_WARNING=" (STALE DATA)"
   else

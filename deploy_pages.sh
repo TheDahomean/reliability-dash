@@ -3,6 +3,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
+BUNDLE_DIR="$ROOT/pages-deploy"
 PROJECT_NAME="${RELIABILITY_DASH_PAGES_PROJECT:-opsdash-public}"
 PRODUCTION_BRANCH="${RELIABILITY_DASH_PAGES_BRANCH:-main}"
 LIVE_URL="${RELIABILITY_DASH_LIVE_URL:-https://reliability.psfarms.co.ke}"
@@ -16,24 +17,23 @@ for env_file in "$ROOT/.env.local" "$ROOT/.env"; do
   fi
 done
 
-TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/reliability-dash-pages.XXXXXX")"
-cleanup() {
-  rm -rf "$TMP_DIR"
-}
-trap cleanup EXIT
-
-mkdir -p "$TMP_DIR/data"
-cp "$ROOT/index.html" "$TMP_DIR/index.html"
-cp "$ROOT/data.js" "$TMP_DIR/data.js"
-cp "$ROOT/opsdash_status.json" "$TMP_DIR/opsdash_status.json"
-cp "$ROOT/favicon.svg" "$TMP_DIR/favicon.svg"
-cp "$ROOT/_headers" "$TMP_DIR/_headers"
-cp "$ROOT/data/opsdash_snapshot.json" "$TMP_DIR/data/opsdash_snapshot.json"
-cp "$ROOT/data/opsdash_snapshot_meta.json" "$TMP_DIR/data/opsdash_snapshot_meta.json"
+for required_path in \
+  "$BUNDLE_DIR/index.html" \
+  "$BUNDLE_DIR/data.js" \
+  "$BUNDLE_DIR/opsdash_status.json" \
+  "$BUNDLE_DIR/favicon.svg" \
+  "$BUNDLE_DIR/_headers" \
+  "$BUNDLE_DIR/data/opsdash_snapshot.json" \
+  "$BUNDLE_DIR/data/opsdash_snapshot_meta.json"; do
+  if [[ ! -f "$required_path" ]]; then
+    echo "Missing bundle artifact: $required_path" >&2
+    exit 1
+  fi
+done
 
 cd "$ROOT"
-echo "Deploying $ROOT to Cloudflare Pages project $PROJECT_NAME"
-"$NPX_BIN" --no-install wrangler pages deploy "$TMP_DIR" \
+echo "Deploying $BUNDLE_DIR to Cloudflare Pages project $PROJECT_NAME"
+"$NPX_BIN" --no-install wrangler pages deploy "$BUNDLE_DIR" \
   --project-name="$PROJECT_NAME" \
   --branch="$PRODUCTION_BRANCH" \
   --commit-dirty=true

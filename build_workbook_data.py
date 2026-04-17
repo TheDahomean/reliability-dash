@@ -16,6 +16,7 @@ NS = {
     "a": "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
     "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
 }
+LOGGED_BATCH_NORMALIZATIONS: set[tuple[str, str]] = set()
 
 SHEET_PREFIXES = {
     "bagging": "LOG 5",
@@ -99,6 +100,13 @@ def parse_int(value: str) -> int:
     return int(parse_number(value))
 
 
+def parse_optional_int(value: str) -> Optional[int]:
+    value = clean_string(value)
+    if not value or value.upper() in {"NA", "N/A", "-"}:
+        return None
+    return int(parse_number(value))
+
+
 def parse_yes_no(value: str) -> bool:
     return clean_string(value).upper() in {"Y", "YES", "PASS", "TRUE"}
 
@@ -117,7 +125,10 @@ def normalize_batch(value: str) -> str:
     # Normalize "SB-YYMMDD-NNX" → "SB-YYMMDD-NN-X" (missing hyphen before vendor)
     s = re.sub(r"(SB-\d{4}/\d{2}/\d{2}-\d{2})([A-Z])\b", r"\1-\2", s)
     if s != original:
-        print(f"normalize_batch: {original!r} → {s!r}", file=sys.stderr)
+        pair = (original, s)
+        if pair not in LOGGED_BATCH_NORMALIZATIONS:
+            print(f"normalize_batch: {original!r} → {s!r}", file=sys.stderr)
+            LOGGED_BATCH_NORMALIZATIONS.add(pair)
     return s
 
 
@@ -207,11 +218,34 @@ def detect_header_row_any(rows: list[list[str]], *expected_first_headers: str) -
     raise KeyError(f"Header row starting with one of [{joined}] not found")
 
 
+def has_incubation_signal(record: dict[str, str]) -> bool:
+    signal_fields = (
+        "Day of Incubation",
+        "Mycelium Growth (Good/Slow/Poor)",
+        "Contamination Observed (Y/N)",
+        "Abnormal Smell (Y/N)",
+        "Number of Bags Removed",
+        "Reason for Removal",
+        "Notes",
+        "Checked By (Name/Signature)",
+    )
+    return any(clean_string(record.get(field, "")) for field in signal_fields)
+
+
 def build_incubation(records: list[dict[str, str]]) -> list[dict[str, object]]:
     payload = []
     for record in records:
         batch = clean_string(record["Substrate Batch ID (SB-YYMMDD-XX-VID)"])
         if not batch:
+            continue
+        day = parse_optional_int(record["Day of Incubation"])
+        if day is None:
+            if not has_incubation_signal(record):
+                continue
+            print(
+                f"Skipping incomplete incubation row for {batch!r}: missing day of incubation.",
+                file=sys.stderr,
+            )
             continue
         payload.append(
             {
@@ -219,7 +253,7 @@ def build_incubation(records: list[dict[str, str]]) -> list[dict[str, object]]:
                 "room": clean_string(record["Room Name"]),
                 "batch": batch,
                 "batchNorm": normalize_batch(batch),
-                "day": parse_int(record["Day of Incubation"]),
+                "day": day,
                 "growth": clean_string(record["Mycelium Growth (Good/Slow/Poor)"]),
                 "contamination": parse_yes_no(record["Contamination Observed (Y/N)"]),
                 "smell": parse_yes_no(record["Abnormal Smell (Y/N)"]),
@@ -362,6 +396,7 @@ def build_context(workbook_path: pathlib.Path, incubation_csv_path: Optional[pat
 
 
 def write_data_js(target: pathlib.Path, context: dict[str, object]) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(
         "window.DASHBOARD_CONTEXT = " + json.dumps(context, separators=(",", ":")) + ";\n",
         encoding="utf-8",

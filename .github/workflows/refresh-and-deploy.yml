@@ -32,31 +32,20 @@ jobs:
             --workbook-output latest_workbook.xlsx \
             --incubation-csv-url "https://docs.google.com/spreadsheets/d/1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg/export?format=csv&gid=1179745250" \
             --incubation-csv-output latest_sheet.csv \
-            --baseline-js-input data.js \
+            --baseline-js-input pages-deploy/data.js \
             --request-timeout-seconds 60 \
             --overall-timeout-seconds 300 \
             --download-attempts 3 \
             --retry-delay-seconds 10 \
             --min-rows 150 \
-            --js-output data.js \
+            --js-output pages-deploy/data.js \
             --service-account-json /tmp/sa.json
 
       - name: Validate snapshot
-        run: python3 validate_snapshot.py data.js
+        run: python3 validate_snapshot.py pages-deploy/data.js
 
       - name: Build public reliability snapshot
         run: python3 build_opsdash_public.py
-
-      - name: Prepare Pages bundle
-        run: |
-          mkdir -p pages-deploy/data
-          cp index.html pages-deploy/index.html
-          cp data.js pages-deploy/data.js
-          cp opsdash_status.json pages-deploy/opsdash_status.json
-          cp favicon.svg pages-deploy/favicon.svg
-          cp _headers pages-deploy/_headers
-          cp data/opsdash_snapshot.json pages-deploy/data/opsdash_snapshot.json
-          cp data/opsdash_snapshot_meta.json pages-deploy/data/opsdash_snapshot_meta.json
 
       - name: Deploy public Reliability dashboard
         uses: cloudflare/wrangler-action@v3

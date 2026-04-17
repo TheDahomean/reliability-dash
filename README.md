@@ -7,9 +7,9 @@ Standalone public reliability dashboard for PS Farms, deployed to Cloudflare Pag
 ```
 Google Sheets workbook export / Sheets API
   -> refresh_dashboard.py
-  -> data.js
+  -> pages-deploy/data.js
   -> build_opsdash_public.py
-  -> index.html + opsdash_status.json + data/opsdash_snapshot*.json
+  -> pages-deploy/index.html + pages-deploy/opsdash_status.json + pages-deploy/data/opsdash_snapshot*.json
   -> deploy_pages.sh
   -> Cloudflare Pages
 ```
@@ -53,5 +53,5 @@ python3 build_opsdash_public.py
 ## Notes
 
 - `index.template.html` is the source template.
-- `index.html` is the generated deploy artifact.
-- `validate_snapshot.py` verifies `data.js` before fallback deploys.
+- `pages-deploy/` is the generated deploy bundle and is gitignored.
+- `validate_snapshot.py` verifies `pages-deploy/data.js` before fallback deploys.
