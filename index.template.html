@@ -45,6 +45,34 @@
       min-height: 100vh;
     }
 
+    body.gate-locked {
+      overflow: hidden;
+    }
+
+    body.gate-locked .shell,
+    body.gate-locked .chart-tooltip {
+      display: none;
+    }
+
+    .access-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top left, rgba(13, 92, 73, 0.26), transparent 34%),
+        radial-gradient(circle at top right, rgba(229, 107, 47, 0.22), transparent 30%),
+        rgba(21, 15, 8, 0.68);
+      backdrop-filter: blur(10px);
+    }
+
+    body.gate-locked .access-gate {
+      display: flex;
+    }
+
     .access-panel {
       width: min(520px, 100%);
       padding: 28px;
@@ -1353,8 +1381,39 @@
       }
     }
   </style>
+  <noscript>
+    <style>
+      body.gate-locked {
+        overflow: auto !important;
+      }
+      body.gate-locked .shell,
+      body.gate-locked .chart-tooltip {
+        display: block !important;
+      }
+      body.gate-locked .access-gate {
+        display: none !important;
+      }
+    </style>
+  </noscript>
 </head>
-<body>
+<body class="gate-locked">
+  <div class="access-gate" id="accessGate">
+    <div class="access-panel">
+      <p class="access-kicker">Protected Access</p>
+      <h1>PS Farms reliability dashboard</h1>
+      <p class="access-copy">
+        Enter the client password to view the customer-facing production reliability snapshot.
+      </p>
+      <form class="access-form" id="accessForm">
+        <label for="accessPassword">Password</label>
+        <input id="accessPassword" name="password" type="password" autocomplete="current-password" />
+        <button type="submit">Open dashboard</button>
+      </form>
+      <div class="access-error" id="accessError" aria-live="polite"></div>
+      <p class="access-note">Password entry is case-insensitive.</p>
+    </div>
+  </div>
+
   __SNAPSHOT_BANNER__
   <div class="shell">
     <section class="hero" id="heroOverview">
@@ -1802,6 +1861,39 @@
   <script id="opsdashSnapshotMeta" type="application/json">__SNAPSHOT_META_JSON__</script>
   <script src="./data.js"></script>
   <script>
+    const VALID_PUBLIC_PASSWORDS = new Set(["zucchini", "cilantro", "citypark", "galleria"]);
+    const ACCESS_STORAGE_KEY = "opsdash-public-access-v3";
+
+    const accessFormEl = document.getElementById("accessForm");
+    const accessPasswordEl = document.getElementById("accessPassword");
+    const accessErrorEl = document.getElementById("accessError");
+
+    function unlockDashboard() {
+      window.localStorage.setItem(ACCESS_STORAGE_KEY, "granted");
+      document.body.classList.remove("gate-locked");
+      accessErrorEl.textContent = "";
+      accessPasswordEl.value = "";
+    }
+
+    function checkPassword(value) {
+      return VALID_PUBLIC_PASSWORDS.has(String(value || "").trim().toLowerCase());
+    }
+
+    if (window.localStorage.getItem(ACCESS_STORAGE_KEY) === "granted") {
+      unlockDashboard();
+    } else {
+      accessPasswordEl.focus();
+    }
+
+    accessFormEl.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (checkPassword(accessPasswordEl.value)) {
+        unlockDashboard();
+        return;
+      }
+      accessErrorEl.textContent = "Incorrect password. Please try again.";
+    });
+
     const snapshotMetaScriptEl = document.getElementById("opsdashSnapshotMeta");
     const publicSnapshotMeta = (() => {
       try { return snapshotMetaScriptEl ? JSON.parse(snapshotMetaScriptEl.textContent) : {}; }
@@ -3113,7 +3205,7 @@
       const groups = byBatch(rows);
       const width = Math.max(980, 320 + (Math.max(...rows.map((row) => row.day), 1) * 30));
       const height = Math.max(236, groups.length * 94 + 126);
-      const margin = { top: 92, right: 170, bottom: 44, left: 160 };
+      const margin = { top: 92, right: 170, bottom: 44, left: 220 };
       const plotWidth = width - margin.left - margin.right;
       const plotHeight = height - margin.top - margin.bottom;
       const maxDay = Math.max(...rows.map((row) => row.day), 1);
@@ -3164,7 +3256,8 @@
         });
         flushCluster();
 
-        svg += `<text x="${margin.left - 14}" y="${yPos - 2}" text-anchor="end" class="axis chart-interactive" tabindex="0" role="button" data-batch-focus="${escapeAttr(group.batch)}" data-tooltip="${escapeAttr(`Focus ${group.batch}`)}">${group.batch}</text>`;
+        const displayBatch = group.batch.length > 28 ? group.batch.slice(0, 25) + "\u2026" : group.batch;
+        svg += `<text x="${margin.left - 14}" y="${yPos - 2}" text-anchor="end" class="axis chart-interactive" tabindex="0" role="button" data-batch-focus="${escapeAttr(group.batch)}" data-tooltip="${escapeAttr(`Focus ${group.batch}`)}">${displayBatch}</text>`;
         svg += `<line x1="${margin.left}" y1="${yPos}" x2="${width - margin.right}" y2="${yPos}" stroke="rgba(33,46,36,0.09)" />`;
         svg += `<polyline fill="none" stroke="rgba(18,60,50,0.26)" stroke-width="3" points="${points}" class="chart-enter-soft chart-interactive" style="animation-delay:${index * 50}ms" data-batch-focus="${escapeAttr(group.batch)}" data-tooltip="${escapeAttr(`Focus ${group.batch}`)}" />`;
 

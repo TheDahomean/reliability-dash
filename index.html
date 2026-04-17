@@ -45,6 +45,34 @@
       min-height: 100vh;
     }
 
+    body.gate-locked {
+      overflow: hidden;
+    }
+
+    body.gate-locked .shell,
+    body.gate-locked .chart-tooltip {
+      display: none;
+    }
+
+    .access-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top left, rgba(13, 92, 73, 0.26), transparent 34%),
+        radial-gradient(circle at top right, rgba(229, 107, 47, 0.22), transparent 30%),
+        rgba(21, 15, 8, 0.68);
+      backdrop-filter: blur(10px);
+    }
+
+    body.gate-locked .access-gate {
+      display: flex;
+    }
+
     .access-panel {
       width: min(520px, 100%);
       padding: 28px;
@@ -1353,8 +1381,39 @@
       }
     }
   </style>
+  <noscript>
+    <style>
+      body.gate-locked {
+        overflow: auto !important;
+      }
+      body.gate-locked .shell,
+      body.gate-locked .chart-tooltip {
+        display: block !important;
+      }
+      body.gate-locked .access-gate {
+        display: none !important;
+      }
+    </style>
+  </noscript>
 </head>
-<body>
+<body class="gate-locked">
+  <div class="access-gate" id="accessGate">
+    <div class="access-panel">
+      <p class="access-kicker">Protected Access</p>
+      <h1>PS Farms reliability dashboard</h1>
+      <p class="access-copy">
+        Enter the client password to view the customer-facing production reliability snapshot.
+      </p>
+      <form class="access-form" id="accessForm">
+        <label for="accessPassword">Password</label>
+        <input id="accessPassword" name="password" type="password" autocomplete="current-password" />
+        <button type="submit">Open dashboard</button>
+      </form>
+      <div class="access-error" id="accessError" aria-live="polite"></div>
+      <p class="access-note">Password entry is case-insensitive.</p>
+    </div>
+  </div>
+
   
   <div class="shell">
     <section class="hero" id="heroOverview">
@@ -1366,7 +1425,7 @@
           behind it, and any current risk that could affect supply.
         </p>
         <p class="hero-cadence" id="hero-cadence">Recommended start: begin with a repeat weekly order at 19.0 kg per week, then scale after clean delivery history.</p>
-        <div class="hero-meta" id="hero-meta"><span class="tag">Harvest through 16 Apr 2026</span><span class="tag ">Snapshot refreshed just now</span><span class="tag">Snapshot EAT 17 Apr 2026, 12:37 AM | ET 16 Apr 2026, 5:37 PM</span></div>
+        <div class="hero-meta" id="hero-meta"><span class="tag">Harvest through 16 Apr 2026</span><span class="tag ">Snapshot refreshed just now</span><span class="tag">Snapshot EAT 17 Apr 2026, 6:49 AM | ET 16 Apr 2026, 11:49 PM</span></div>
       </div>
     </section>
 
@@ -1657,7 +1716,7 @@
             <select id="batchFilter"><option value="all" selected="selected">All batches</option><option value="SB-2026-09-04-11 LK SB-2026-09-04-11 JG">SB-2026-09-04-11 LK SB-2026-09-04-11 JG</option><option value="SB-2026/01/27-01-ED SB-2026/01/27-01-NM">SB-2026/01/27-01-ED SB-2026/01/27-01-NM</option><option value="SB-2026/02/05-02-ED SB-2026/02/05-02-NM SB-2026/02/05-02-LK">SB-2026/02/05-02-ED SB-2026/02/05-02-NM SB-2026/02/05-02-LK</option><option value="SB-2026/02/12-03-LK">SB-2026/02/12-03-LK</option><option value="SB-2026/02/19-04-NN">SB-2026/02/19-04-NN</option><option value="SB-2026/02/25-05">SB-2026/02/25-05</option><option value="SB-2026/02/25-05-LK SB-2026/02/25-05-NN">SB-2026/02/25-05-LK SB-2026/02/25-05-NN</option><option value="SB-2026/03/11-06-LK SB-2026/03/11-06-JG">SB-2026/03/11-06-LK SB-2026/03/11-06-JG</option><option value="SB-2026/03/23-07-JG SB-2026/03/23-07-LK">SB-2026/03/23-07-JG SB-2026/03/23-07-LK</option><option value="SB-2026/03/24-08-VM SB-2026/03/24-08-JG SB-2026/03/24-08-LK">SB-2026/03/24-08-VM SB-2026/03/24-08-JG SB-2026/03/24-08-LK</option><option value="SB-2026/03/31-09-LK SB-2026/03/31-09-G">SB-2026/03/31-09-LK SB-2026/03/31-09-G</option><option value="SB-2026/04/04-10-LK">SB-2026/04/04-10-LK</option><option value="SB-2026/04/04-10-LK SB-2026/04/04-10-JG">SB-2026/04/04-10-LK SB-2026/04/04-10-JG</option></select>
           </div>
           <div class="control-note">The top promise metrics stay portfolio-wide. The selector changes only the layer-3 supporting detail below.</div>
-          <div class="focus-status" id="focusStatus"><span class="focus-chip muted">Portfolio promise: all batches</span><span class="focus-chip">Snapshot refreshed just now</span><span class="focus-chip muted">Build 0bab8cd+dirty</span></div>
+          <div class="focus-status" id="focusStatus"><span class="focus-chip muted">Portfolio promise: all batches</span><span class="focus-chip">Snapshot refreshed just now</span><span class="focus-chip muted">Build f86271e+dirty</span></div>
         </div>
         <div class="promise-method">
           <div class="promise-method-card">
@@ -1794,14 +1853,47 @@
       </div>
     </section>
 
-    <p class="footer">Snapshot generated 2026-04-16T21:37:23.749519Z UTC from Google Sheets workbook 1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg. Build 0bab8cd+dirty. Portfolio promise view. Row counts: bagging=12, pasteurization=12, incubation=115, fruiting=20, harvest=44.</p>
+    <p class="footer">Snapshot generated 2026-04-17T03:49:26.738220Z UTC from Google Sheets workbook 1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg. Build f86271e+dirty. Portfolio promise view. Row counts: bagging=12, pasteurization=12, incubation=115, fruiting=20, harvest=44.</p>
   </div>
 
   <div class="chart-tooltip" id="chartTooltip"></div>
 
-  <script id="opsdashSnapshotMeta" type="application/json">{"build_version":"0bab8cd+dirty","generated_at":"2026-04-16T21:37:23.749519Z","refresh_interval_minutes":15,"row_counts":{"bagging":12,"fruiting":20,"harvest":44,"incubation":115,"pasteurization":12},"selected_batch":"all","source_sheet":{"logs":{"bagging":"LOG 5","fruiting":"LOG 10 - Fruiting Room And Envi","harvest":"LOG 11 - Harvest (Ccp 2)","incubation":"LOG 9 - Incubation Daily Check","pasteurization":"LOG 6"},"spreadsheet_id":"1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg"},"source_type":"google_sheets_workbook_export"}</script>
+  <script id="opsdashSnapshotMeta" type="application/json">{"build_version":"f86271e+dirty","generated_at":"2026-04-17T03:49:26.738220Z","refresh_interval_minutes":15,"row_counts":{"bagging":12,"fruiting":20,"harvest":44,"incubation":115,"pasteurization":12},"selected_batch":"all","source_sheet":{"logs":{"bagging":"LOG 5","fruiting":"LOG 10 - Fruiting Room And Envi","harvest":"LOG 11 - Harvest (Ccp 2)","incubation":"LOG 9 - Incubation Daily Check","pasteurization":"LOG 6"},"spreadsheet_id":"1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg"},"source_type":"google_sheets_workbook_export"}</script>
   <script src="./data.js"></script>
   <script>
+    const VALID_PUBLIC_PASSWORDS = new Set(["zucchini", "cilantro", "citypark", "galleria"]);
+    const ACCESS_STORAGE_KEY = "opsdash-public-access-v3";
+
+    const accessFormEl = document.getElementById("accessForm");
+    const accessPasswordEl = document.getElementById("accessPassword");
+    const accessErrorEl = document.getElementById("accessError");
+
+    function unlockDashboard() {
+      window.localStorage.setItem(ACCESS_STORAGE_KEY, "granted");
+      document.body.classList.remove("gate-locked");
+      accessErrorEl.textContent = "";
+      accessPasswordEl.value = "";
+    }
+
+    function checkPassword(value) {
+      return VALID_PUBLIC_PASSWORDS.has(String(value || "").trim().toLowerCase());
+    }
+
+    if (window.localStorage.getItem(ACCESS_STORAGE_KEY) === "granted") {
+      unlockDashboard();
+    } else {
+      accessPasswordEl.focus();
+    }
+
+    accessFormEl.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (checkPassword(accessPasswordEl.value)) {
+        unlockDashboard();
+        return;
+      }
+      accessErrorEl.textContent = "Incorrect password. Please try again.";
+    });
+
     const snapshotMetaScriptEl = document.getElementById("opsdashSnapshotMeta");
     const publicSnapshotMeta = (() => {
       try { return snapshotMetaScriptEl ? JSON.parse(snapshotMetaScriptEl.textContent) : {}; }
@@ -3113,7 +3205,7 @@
       const groups = byBatch(rows);
       const width = Math.max(980, 320 + (Math.max(...rows.map((row) => row.day), 1) * 30));
       const height = Math.max(236, groups.length * 94 + 126);
-      const margin = { top: 92, right: 170, bottom: 44, left: 160 };
+      const margin = { top: 92, right: 170, bottom: 44, left: 220 };
       const plotWidth = width - margin.left - margin.right;
       const plotHeight = height - margin.top - margin.bottom;
       const maxDay = Math.max(...rows.map((row) => row.day), 1);
@@ -3164,7 +3256,8 @@
         });
         flushCluster();
 
-        svg += `<text x="${margin.left - 14}" y="${yPos - 2}" text-anchor="end" class="axis chart-interactive" tabindex="0" role="button" data-batch-focus="${escapeAttr(group.batch)}" data-tooltip="${escapeAttr(`Focus ${group.batch}`)}">${group.batch}</text>`;
+        const displayBatch = group.batch.length > 28 ? group.batch.slice(0, 25) + "\u2026" : group.batch;
+        svg += `<text x="${margin.left - 14}" y="${yPos - 2}" text-anchor="end" class="axis chart-interactive" tabindex="0" role="button" data-batch-focus="${escapeAttr(group.batch)}" data-tooltip="${escapeAttr(`Focus ${group.batch}`)}">${displayBatch}</text>`;
         svg += `<line x1="${margin.left}" y1="${yPos}" x2="${width - margin.right}" y2="${yPos}" stroke="rgba(33,46,36,0.09)" />`;
         svg += `<polyline fill="none" stroke="rgba(18,60,50,0.26)" stroke-width="3" points="${points}" class="chart-enter-soft chart-interactive" style="animation-delay:${index * 50}ms" data-batch-focus="${escapeAttr(group.batch)}" data-tooltip="${escapeAttr(`Focus ${group.batch}`)}" />`;
 

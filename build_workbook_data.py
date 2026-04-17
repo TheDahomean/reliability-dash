@@ -105,11 +105,11 @@ def parse_yes_no(value: str) -> bool:
 
 def normalize_batch(value: str) -> str:
     s = clean_string(value)
+    original = s
     # Remove parenthetical annotations
     s = re.sub(r"\s*\([^)]*\)", "", s).strip()
-    original = s
     # Remove stray characters like ++ within batch IDs
-    s = re.sub(r"\+{1,}", "", s)
+    s = re.sub(r"\++", "", s)
     # Collapse multiple spaces to single
     s = re.sub(r"\s{2,}", " ", s)
     # Normalize "SB-YYMMDD-NN VID" → "SB-YYMMDD-NN-VID" (space before vendor suffix)

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-16T21:37:23.749519Z",
+  "generated_at": "2026-04-17T03:49:26.738220Z",
   "source_type": "google_sheets_workbook_export",
   "source_sheet": {
     "spreadsheet_id": "1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg",
@@ -19,6 +19,6 @@
     "harvest": 44
   },
   "selected_batch": "all",
-  "build_version": "0bab8cd+dirty",
+  "build_version": "f86271e+dirty",
   "refresh_interval_minutes": 15
 }

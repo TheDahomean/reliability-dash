@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-04-16T21:37:23.749519Z",
+  "generated_at": "2026-04-17T03:49:26.738220Z",
   "snapshot_present": true,
   "snapshot_bytes": 84392,
   "row_counts": {
@@ -11,5 +11,5 @@
     "harvest": 44
   },
   "refresh_interval_minutes": 15,
-  "build_version": "0bab8cd+dirty"
+  "build_version": "f86271e+dirty"
 }
