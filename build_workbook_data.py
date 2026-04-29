@@ -29,6 +29,8 @@ SHEET_PREFIXES = {
 
 def excel_serial_to_date(value: str) -> str:
     serial = float(value)
+    if serial < 1 or serial > 200000:
+        return ""
     base = dt.datetime(1899, 12, 30)
     return (base + dt.timedelta(days=serial)).date().isoformat()
 
@@ -111,19 +113,17 @@ def parse_yes_no(value: str) -> bool:
     return clean_string(value).upper() in {"Y", "YES", "PASS", "TRUE"}
 
 
+_SB_DATE = r"SB-\d{4}[/-]\d{2}[/-]\d{2}-\d{2}"
+
+
 def normalize_batch(value: str) -> str:
     s = clean_string(value)
     original = s
-    # Remove parenthetical annotations
-    s = re.sub(r"\s*\([^)]*\)", "", s).strip()
-    # Remove stray characters like ++ within batch IDs
+    s = re.sub(r"\s*\([^)]*\)", " ", s).strip()
     s = re.sub(r"\++", "", s)
-    # Collapse multiple spaces to single
     s = re.sub(r"\s{2,}", " ", s)
-    # Normalize "SB-YYMMDD-NN VID" → "SB-YYMMDD-NN-VID" (space before vendor suffix)
-    s = re.sub(r"(SB-\d{4}/\d{2}/\d{2}-\d{2})\s+([A-Z]{1,3})\b", r"\1-\2", s)
-    # Normalize "SB-YYMMDD-NNX" → "SB-YYMMDD-NN-X" (missing hyphen before vendor)
-    s = re.sub(r"(SB-\d{4}/\d{2}/\d{2}-\d{2})([A-Z])\b", r"\1-\2", s)
+    s = re.sub(rf"({_SB_DATE})\s+([A-Za-z]{{1,3}})\b", r"\1-\2", s)
+    s = re.sub(rf"({_SB_DATE})([A-Za-z]{{1,3}})\b", r"\1-\2", s)
     if s != original:
         pair = (original, s)
         if pair not in LOGGED_BATCH_NORMALIZATIONS:
@@ -133,7 +133,7 @@ def normalize_batch(value: str) -> str:
 
 
 def split_batch_ids(value: str) -> list[str]:
-    return [item for item in re.findall(r"SB-\d{4}/\d{2}/\d{2}-\d{2}", clean_string(value))]
+    return re.findall(_SB_DATE, clean_string(value))
 
 
 def load_sheet_rows(workbook_path: pathlib.Path, sheet_prefix: str) -> list[list[str]]:

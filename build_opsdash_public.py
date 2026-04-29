@@ -396,11 +396,11 @@ def build_reliability_model(
 
     recent_harvest_rows_7 = [
         row for row in normalized_harvest_rows
-        if latest_harvest_date_text and (anchor_date - iso_to_date(row.get("date", latest_harvest_date_text))).days <= 6
+        if latest_harvest_date_text and (row.get("date") or latest_harvest_date_text) and (anchor_date - iso_to_date(row.get("date") or latest_harvest_date_text)).days <= 6
     ]
     recent_harvest_rows_14 = [
         row for row in normalized_harvest_rows
-        if latest_harvest_date_text and (anchor_date - iso_to_date(row.get("date", latest_harvest_date_text))).days <= 13
+        if latest_harvest_date_text and (row.get("date") or latest_harvest_date_text) and (anchor_date - iso_to_date(row.get("date") or latest_harvest_date_text)).days <= 13
     ]
     recent_harvest_7_kg = sum(float(row.get("quantityHarvestedKg", 0) or 0) for row in recent_harvest_rows_7)
     recent_harvest_14_kg = sum(float(row.get("quantityHarvestedKg", 0) or 0) for row in recent_harvest_rows_14)
