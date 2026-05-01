@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -20,12 +20,12 @@ WORKBOOK_URL="${GOOGLE_SHEETS_WORKBOOK_URL:-https://docs.google.com/spreadsheets
 INCUBATION_CSV_URL="${GOOGLE_SHEETS_CSV_URL:-https://docs.google.com/spreadsheets/d/1IlCrI_aPESNDtPZ9629GSCjsCBhTakxbMP9eTlgzxUg/export?format=csv&gid=1179745250}"
 
 timestamp() {
-  /bin/date "+%Y-%m-%d %H:%M:%S"
+  date "+%Y-%m-%d %H:%M:%S"
 }
 
 echo "[$(timestamp)] refresh_dashboard started"
 
-/usr/bin/python3 "$ROOT/refresh_dashboard.py" \
+python3 "$ROOT/refresh_dashboard.py" \
   --workbook-url "$WORKBOOK_URL" \
   --workbook-output "$ROOT/latest_workbook.xlsx" \
   --incubation-csv-url "$INCUBATION_CSV_URL" \

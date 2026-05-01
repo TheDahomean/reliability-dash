@@ -12,7 +12,7 @@ say "Repo context"
 git rev-parse --verify HEAD >/dev/null 2>&1 || fail "No git HEAD. NEXT: git add -A && git commit -m 'Initial commit'"
 
 say "Hazards tracked?"
-tracked="$(git ls-files | grep -E '(^|/)(\.tmp/|\.auth/|chromium-profile/|node_modules/|\.venv/)|(^|/)\.env(\.|$)|backup' || true)"
+tracked="$(git ls-files | grep -E '(^|/)(\.tmp/|\.auth/|chromium-profile/|node_modules/|\.venv/)|(^|/)\.env(\.|$)|backup' | grep -v '\.env\.example' || true)"
 [[ -z "$tracked" ]] || fail "Hazards are tracked. NEXT: add to .gitignore and git rm --cached ..."
 
 say "Python compile"

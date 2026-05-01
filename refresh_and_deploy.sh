@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 BUNDLE_DIR="$ROOT/pages-deploy"
@@ -11,11 +11,12 @@ for env_file in "$ROOT/.env.local" "$ROOT/.env"; do
 done
 
 notify() {
-  /usr/bin/osascript -e "display notification \"$2\" with title \"$1\""
+  [[ "$(uname)" == "Darwin" ]] || return 0
+  osascript -e "display notification \"$2\" with title \"$1\""
 }
 
 timestamp() {
-  /bin/date "+%Y-%m-%d %H:%M:%S"
+  date "+%Y-%m-%d %H:%M:%S"
 }
 
 echo "[$(timestamp)] refresh_and_deploy started"
@@ -24,12 +25,12 @@ REFRESH_STATUS="OK"
 STALE_WARNING=""
 DEPLOY_STATUS="OK"
 
-if /bin/zsh "$ROOT/refresh_dashboard.sh"; then
+if bash "$ROOT/refresh_dashboard.sh"; then
   echo "[$(timestamp)] refresh step succeeded"
 else
   echo "[$(timestamp)] refresh step failed; checking for usable snapshot" >&2
   REFRESH_STATUS="FAILED"
-  if [[ -f "$BUNDLE_DIR/data.js" ]] && /usr/bin/python3 "$ROOT/validate_snapshot.py" "$BUNDLE_DIR/data.js" 2>/dev/null; then
+  if [[ -f "$BUNDLE_DIR/data.js" ]] && python3 "$ROOT/validate_snapshot.py" "$BUNDLE_DIR/data.js" 2>/dev/null; then
     echo "[$(timestamp)] valid stale snapshot found; proceeding with deploy using cached data" >&2
     STALE_WARNING=" (STALE DATA)"
   else
@@ -39,10 +40,10 @@ else
   fi
 fi
 
-/usr/bin/python3 "$ROOT/build_opsdash_public.py"
+python3 "$ROOT/build_opsdash_public.py"
 echo "[$(timestamp)] rebuilt public reliability site"
 
-if /bin/zsh "$ROOT/deploy_pages.sh"; then
+if bash "$ROOT/deploy_pages.sh"; then
   echo "[$(timestamp)] deploy step succeeded"
 else
   echo "[$(timestamp)] deploy step failed" >&2
