@@ -43,14 +43,18 @@ staged="$(git diff --cached --name-only)"
 [[ -n "$staged" ]] || exit 0
 bad=0
 while IFS= read -r f; do
-  echo "$f" | grep -Eiq "$forbidden" && { echo "BLOCKED: $f" >&2; bad=1; }
+  echo "$f" | grep -qv '\.env\.example' && echo "$f" | grep -Eiq "$forbidden" && { echo "BLOCKED: $f" >&2; bad=1; } || true
 done <<< "$staged"
 [[ "$bad" -eq 0 ]] || exit 1
 HOOK
 chmod +x .githooks/pre-commit
 git config core.hooksPath .githooks
 
-# Install cron refresh job (idempotent — removes any stale entry first)
-CRON_LINE="*/15 * * * * $ROOT/scripts/cron_refresh.sh >> $ROOT/logs/refresh.log 2>&1"
-(crontab -l 2>/dev/null | grep -v "reliability-dash/scripts/cron_refresh.sh"; echo "$CRON_LINE") | crontab -
-echo "Cron refresh installed: $CRON_LINE"
+# Install cron refresh job only when crontab is available (local machines only)
+if command -v crontab >/dev/null 2>&1; then
+  CRON_LINE="*/15 * * * * $ROOT/scripts/cron_refresh.sh >> $ROOT/logs/refresh.log 2>&1"
+  (crontab -l 2>/dev/null | grep -v "reliability-dash/scripts/cron_refresh.sh"; echo "$CRON_LINE") | crontab -
+  echo "Cron refresh installed: $CRON_LINE"
+else
+  echo "crontab not available; skipping cron install (CI or container environment)"
+fi

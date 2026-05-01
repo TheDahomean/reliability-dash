@@ -9,7 +9,7 @@ python3 build_opsdash_public.py
 ./deploy_pages.sh
 ./verify_live.sh
 python3 validate_snapshot.py pages-deploy/data.js
-python3 scripts/check_snapshot_freshness.py --status-json pages-deploy/opsdash_status.json
+python3 scripts/check_snapshot_freshness.py --status-json opsdash_status.json
 python3 -m http.server 8080
 ./scripts/refresher.sh
 ./scripts/codex_bootstrap.sh
@@ -40,6 +40,7 @@ Put local secrets in `.env.local` (gitignored).
 | Variable | Notes |
 |---|---|
 | `GOOGLE_SERVICE_ACCOUNT_JSON` | Local service-account JSON path for workbook access |
+| `CLOUDFLARE_API_TOKEN` | Required for `deploy_pages.sh`; set as GitHub Actions secret in CI |
 | `GOOGLE_SHEETS_WORKBOOK_URL` | Optional workbook override |
 | `GOOGLE_SHEETS_CSV_URL` | Optional incubation CSV override |
 | `RELIABILITY_DASH_PAGES_PROJECT` | Default `opsdash-public` |

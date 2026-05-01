@@ -8,7 +8,8 @@ PROJECT_NAME="${RELIABILITY_DASH_PAGES_PROJECT:-opsdash-public}"
 PRODUCTION_BRANCH="${RELIABILITY_DASH_PAGES_BRANCH:-main}"
 LIVE_URL="${RELIABILITY_DASH_LIVE_URL:-https://reliability.psfarms.co.ke}"
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
-NPX_BIN="${NPX_BIN:-$(command -v npx)}"
+NPX_BIN="${NPX_BIN:-$(command -v npx 2>/dev/null || true)}"
+[[ -n "$NPX_BIN" ]] || { echo "npx not found. Install Node.js or set NPX_BIN." >&2; exit 1; }
 
 for env_file in "$ROOT/.env.local" "$ROOT/.env"; do
   if [[ -f "$env_file" ]]; then

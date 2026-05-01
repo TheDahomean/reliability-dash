@@ -6,6 +6,6 @@ staged="$(git diff --cached --name-only)"
 [[ -n "$staged" ]] || exit 0
 bad=0
 while IFS= read -r f; do
-  echo "$f" | grep -Eiq "$forbidden" && { echo "BLOCKED: $f" >&2; bad=1; }
+  echo "$f" | grep -qv '\.env\.example' && echo "$f" | grep -Eiq "$forbidden" && { echo "BLOCKED: $f" >&2; bad=1; } || true
 done <<< "$staged"
 [[ "$bad" -eq 0 ]] || exit 1
