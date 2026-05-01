@@ -30,7 +30,11 @@ SHEET_PREFIXES = {
 def excel_serial_to_date(value: str) -> str:
     serial = float(value)
     base = dt.datetime(1899, 12, 30)
-    return (base + dt.timedelta(days=serial)).date().isoformat()
+    try:
+        return (base + dt.timedelta(days=serial)).date().isoformat()
+    except (OverflowError, ValueError):
+        print(f"Warning: excel serial {value!r} out of date range; treating as empty", file=sys.stderr)
+        return ""
 
 
 def clean_string(value: str) -> str:
