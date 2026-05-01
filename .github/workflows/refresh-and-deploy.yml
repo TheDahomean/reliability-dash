@@ -23,7 +23,12 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Write service account key
-        run: echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}' > /tmp/sa.json
+        env:
+          SA_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          printf '%s' "$SA_JSON" > /tmp/sa.json
+          python3 -c "import json,sys; json.load(open('/tmp/sa.json'))" \
+            || { echo "ERROR: GOOGLE_SERVICE_ACCOUNT_JSON secret is missing or not valid JSON. Paste the full contents of the service account key file, not a file path." >&2; exit 1; }
 
       - name: Refresh data from Google Sheets
         run: |
