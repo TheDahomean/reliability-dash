@@ -20,19 +20,19 @@ Codex (`gpt-5.5`), 2026-05-16.
 
 ## Commit / PR
 
-- `HEAD` is `481cbad` on `codex/2026-04-03-work`.
-- `origin/codex/2026-04-03-work` is still at `af7ac26`; the local branch is 2 commits ahead.
+- `HEAD` is `a22e048` on `codex/2026-04-03-work`.
+- `origin/codex/2026-04-03-work` is still at `af7ac26`; the local branch is 3 commits ahead.
 - Local `main` and `origin/main` refs in this checkout still point to `6af9ab1` because no post-push fetch was run.
-- Remote GitHub `main` was advanced in this session to `8c13f27`, then `faf8d84`, then `481cbad`, confirmed via `git push` and the public GitHub API.
+- Remote GitHub `main` was advanced in earlier sessions to `8c13f27`, then `faf8d84`, then `481cbad`, and in this session to `a22e048`, confirmed via `git push` and live publish verification.
 - No PR metadata was checked in this session.
 
 ## Files changed
 
 - Before this session, the worktree already had modified `docs/HANDOFF.md` and untracked `AGENTS.md`.
-- This session modified `build_workbook_data.py` to normalize workbook headers before record lookup.
-- This session modified `index.template.html` to ignore blank/invalid harvest dates in client-side date math so the freshness badge still renders.
-- This session regenerated the local `pages-deploy/` bundle from `latest_workbook.xlsx`, producing a fresh local snapshot at `generated_at=2026-05-16T09:30:55.391807Z`.
-- The remaining uncommitted worktree state at session end is modified `build_workbook_data.py`, modified `index.template.html`, modified `docs/HANDOFF.md`, and untracked `AGENTS.md`.
+- This session committed `build_workbook_data.py`, `index.template.html`, and `docs/HANDOFF.md` as `a22e048` on `codex/2026-04-03-work`.
+- This session pushed `a22e048` to remote `main`, which triggered the GitHub Actions refresh/deploy workflow and published the fix.
+- This session regenerated the local `pages-deploy/` bundle from `latest_workbook.xlsx`, first at `generated_at=2026-05-16T09:30:55.391807Z` and later at `generated_at=2026-05-16T10:15:08.104928Z` before push.
+- The remaining uncommitted worktree state at session end is modified `docs/HANDOFF.md` and untracked `AGENTS.md`.
 
 ## What is complete
 
@@ -87,14 +87,20 @@ Codex (`gpt-5.5`), 2026-05-16.
   - the browser render path now skips blank/invalid harvest dates instead of throwing before it can replace the build-time freshness label.
   - the locally regenerated bundle is fresh again at `generated_at=2026-05-16T09:30:55.391807Z`
   - the latest local row counts are `bagging=16`, `pasteurization=16`, `incubation=152`, `fruiting=47`, `harvest=74`
+- The fix is now published live:
+  - `https://reliability.psfarms.co.ke/opsdash_status.json`
+  - `https://opsdash-public.pages.dev/opsdash_status.json`
+  - both returned `generated_at=2026-05-16T10:16:39.860961Z`
+  - both returned `build_version=a22e048+dirty`
+  - both returned matching row counts: `bagging=16`, `pasteurization=16`, `incubation=152`, `fruiting=47`, `harvest=74`
+  - `bash -x ./verify_live.sh` passed after publish
 
 ## What is incomplete
 
 - There is still no automated regression coverage for the parser/build fixes.
 - Local shell wrappers still include hard-coded shell/binary paths and a macOS notification call, even though the scheduled production path runs in GitHub Actions.
 - `AGENTS.md` exists in this checkout but is currently untracked, so those instructions do not travel with the branch unless the file is committed.
-- The live site is still stale as of this session because the fixed code and fresh local bundle were not deployed.
-- Local deploy is still blocked by a missing `CLOUDFLARE_API_TOKEN`, and a second full Google refresh attempt in the sandbox hit DNS resolution failures for `oauth2.googleapis.com` after the workbook had already been downloaded once.
+- Local direct Cloudflare deploy is still blocked without `CLOUDFLARE_API_TOKEN`, even though the GitHub Actions publish path worked.
 
 ## Risks / uncertainties
 
@@ -103,6 +109,7 @@ Codex (`gpt-5.5`), 2026-05-16.
 - The published site currently reports `build_version=481cbad+dirty` because the workflow deploys from a generated bundle after refresh/build, not from a pristine git tree.
 - Because `AGENTS.md` is currently untracked, other clones or clean checkouts will not see those repo-local instructions unless the file is committed.
 - The local `latest_workbook.xlsx` used for verification is fresh for this session, but it is only a local artifact until the code is committed and a deploy path publishes the regenerated bundle.
+- DNS resolution inside this sandbox remained intermittent during the session, so ad hoc Python/cURL checks against GitHub and Google were less reliable than the successful git push and final live verification.
 
 ## QA commands run
 
@@ -115,6 +122,10 @@ Codex (`gpt-5.5`), 2026-05-16.
 - `./refresh_dashboard.sh`
 - `python3 - <<'PY' from build_workbook_data import build_context ... PY`
 - `python3 - <<'PY' from build_workbook_data import build_context, write_data_js ... PY`
+- `git push origin HEAD:main`
+- `curl -sS https://reliability.psfarms.co.ke/opsdash_status.json`
+- `curl -sS https://opsdash-public.pages.dev/opsdash_status.json`
+- `bash -x ./verify_live.sh`
 
 ## QA results
 
@@ -131,15 +142,17 @@ Codex (`gpt-5.5`), 2026-05-16.
 - `./refresh_dashboard.sh` no longer failed on the harvest header lookup after `rows_to_records()` was normalized; the remaining rerun failure was outbound DNS resolution to `oauth2.googleapis.com` in the sandbox.
 - `build_context('latest_workbook.xlsx')` passed after the header-normalization fix and produced `bagging=16`, `pasteurization=16`, `incubation=152`, `fruiting=47`, `harvest=74`.
 - Manual local regeneration of `pages-deploy/data.js` from `latest_workbook.xlsx` succeeded, and the rebuilt `pages-deploy/opsdash_status.json` then passed freshness with `generated_at=2026-05-16T09:30:55.391807Z`.
+- `git push origin HEAD:main` succeeded and advanced remote `main` to `a22e048`.
+- After the push-triggered workflow completed, both public status URLs advanced to `generated_at=2026-05-16T10:16:39.860961Z` with `build_version=a22e048+dirty`.
+- Final `bash -x ./verify_live.sh`: passed against the live site after publish.
 
 ## Next recommended task
 
-Deploy the current fixes and refreshed local bundle, then add regression coverage for:
+Add regression coverage for:
 
-1. publishing the modified `build_workbook_data.py` and `index.template.html` so production can refresh again
-2. out-of-range and malformed Excel serial handling in `build_workbook_data.py`
-3. batch normalization and splitting for slash-form and hyphen-form `SB-YYYY-MM-DD-NN` IDs with vendor suffixes
-4. blank harvest dates flowing through the recent-harvest windows in `build_opsdash_public.py`
+1. out-of-range and malformed Excel serial handling in `build_workbook_data.py`
+2. batch normalization and splitting for slash-form and hyphen-form `SB-YYYY-MM-DD-NN` IDs with vendor suffixes
+3. blank harvest dates flowing through the recent-harvest windows in `build_opsdash_public.py`
 
 ## Do not touch without asking
 
@@ -150,12 +163,7 @@ Deploy the current fixes and refreshed local bundle, then add regression coverag
 
 ## Resume prompt for next agent
 
-Read `AGENTS.md`, `CLAUDE.md`, and `docs/HANDOFF.md` first. `AGENTS.md` is currently untracked in the worktree. The worktree now contains uncommitted fixes in `build_workbook_data.py` and `index.template.html`:
-
-- `build_workbook_data.py`: header cells are normalized before records are built, fixing harvest-sheet header drift such as trailing newlines.
-- `index.template.html`: browser-side harvest date math now skips blank/invalid dates, preventing the stale build-time "Snapshot refreshed just now" label from sticking when render crashes.
-
-The latest local generated bundle is fresh at `generated_at=2026-05-16T09:30:55.391807Z`, but the live site was not updated in this session because local deploy still lacks `CLOUDFLARE_API_TOKEN`. Next useful step: publish these fixes, then rerun:
+Read `AGENTS.md`, `CLAUDE.md`, and `docs/HANDOFF.md` first. `AGENTS.md` is currently untracked in the worktree. The browser freshness fix and workbook-header fix are already committed in `a22e048` and were published successfully via a push-triggered GitHub Actions run. The next useful step is adding regression coverage, then rerunning:
 
 - `python3 validate_snapshot.py pages-deploy/data.js`
 - `python3 build_opsdash_public.py`
@@ -217,3 +225,5 @@ The latest local generated bundle is fresh at `generated_at=2026-05-16T09:30:55.
 - Regenerated `pages-deploy/data.js` and the local public bundle from the downloaded workbook snapshot, producing a fresh local `generated_at=2026-05-16T09:30:55.391807Z` with row counts `bagging=16`, `pasteurization=16`, `incubation=152`, `fruiting=47`, `harvest=74`.
 - Confirmed `python3 validate_snapshot.py pages-deploy/data.js` and `python3 scripts/check_snapshot_freshness.py --status-json pages-deploy/opsdash_status.json` both pass after the rebuild.
 - Local deploy still failed because `wrangler` could not find a usable `CLOUDFLARE_API_TOKEN`, so the live site was not updated in this session.
+- Committed the fixes as `a22e048`, pushed `HEAD -> main`, and verified that the push-triggered production workflow published the updated snapshot.
+- Final live verification passed with both public status URLs at `generated_at=2026-05-16T10:16:39.860961Z` and `build_version=a22e048+dirty`.
