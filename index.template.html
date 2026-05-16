@@ -2107,7 +2107,11 @@
     }
 
     function parseIsoDate(value) {
-      return value ? new Date(`${value}T12:00:00Z`) : null;
+      if (!value) {
+        return null;
+      }
+      const parsed = new Date(`${value}T12:00:00Z`);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
     }
 
     function formatIsoDate(value) {
@@ -2407,6 +2411,7 @@
       const productionPairs = getProductionPairs();
       const productionByBaseBatch = new Map(productionPairs.map((entry) => [entry.row.batchNorm, entry.actualBags]));
       const latestVariants = latestPerBatch(allRows).map((entry) => entry.latest);
+      const datedHarvestRows = harvestRows.filter((row) => parseIsoDate(row.date));
       const baseContexts = new Map();
       const fruitingLatestByLot = new Map();
       const harvestByLot = new Map();
@@ -2480,7 +2485,7 @@
         context.preparedBags = productionByBaseBatch.get(baseBatch) || context.loggedBags;
       });
 
-      const latestHarvestDateText = harvestRows.map((row) => row.date).filter(Boolean).sort().slice(-1)[0] || "";
+      const latestHarvestDateText = datedHarvestRows.map((row) => row.date).sort().slice(-1)[0] || "";
       const latestHarvestDate = latestHarvestDateText ? parseIsoDate(latestHarvestDateText) : null;
       const anchorDate = latestHarvestDate || (dashboardGeneratedAt instanceof Date && !Number.isNaN(dashboardGeneratedAt.getTime()) ? dashboardGeneratedAt : new Date());
 
@@ -2507,10 +2512,10 @@
       const kgPerPreparedBag = linkedPreparedBags ? (totalHarvestedKg / linkedPreparedBags) : 0.205;
 
       const recentHarvestRows7 = latestHarvestDate
-        ? harvestRows.filter((row) => ((latestHarvestDate.getTime() - parseIsoDate(row.date).getTime()) / 86400000) <= 6)
+        ? datedHarvestRows.filter((row) => ((latestHarvestDate.getTime() - parseIsoDate(row.date).getTime()) / 86400000) <= 6)
         : [];
       const recentHarvestRows14 = latestHarvestDate
-        ? harvestRows.filter((row) => ((latestHarvestDate.getTime() - parseIsoDate(row.date).getTime()) / 86400000) <= 13)
+        ? datedHarvestRows.filter((row) => ((latestHarvestDate.getTime() - parseIsoDate(row.date).getTime()) / 86400000) <= 13)
         : [];
       const recentHarvest7Kg = recentHarvestRows7.reduce((sum, row) => sum + (row.quantityHarvestedKg || 0), 0);
       const recentHarvest14Kg = recentHarvestRows14.reduce((sum, row) => sum + (row.quantityHarvestedKg || 0), 0);
@@ -2519,7 +2524,7 @@
       const acceptanceRate = recentHarvest14Kg ? (recentAccepted14Kg / recentHarvest14Kg) * 100 : 0;
       const rejectionRate = recentHarvest14Kg ? (recentRejected14Kg / recentHarvest14Kg) * 100 : 0;
 
-      const dailyHarvestMap = harvestRows.reduce((map, row) => {
+      const dailyHarvestMap = datedHarvestRows.reduce((map, row) => {
         if (!map.has(row.date)) {
           map.set(row.date, { date: row.date, harvestedKg: 0, rejectedKg: 0 });
         }
@@ -3161,7 +3166,7 @@
       const benchmarkHigh = 40;
       const yieldBenchmarkStatus = Number(kgPer100PreparedBags) >= benchmarkLow ? "within or above benchmark" : "below benchmark";
       const shortfallToLow = Math.max(benchmarkLow - Number(kgPer100PreparedBags), 0).toFixed(2);
-      const latestHarvestDate = harvestRows.map((row) => row.date).filter(Boolean).sort().slice(-1)[0];
+      const latestHarvestDate = harvestRows.filter((row) => parseIsoDate(row.date)).map((row) => row.date).sort().slice(-1)[0];
 
       yieldSummaryEl.innerHTML = [
         { value: `${fruitingBatches.size}/${incubationBatches.size}`, label: focused ? "Focused batch lines that reached fruiting" : "Incubation batches that reached fruiting", tone: "stage-incubation", note: "" },
@@ -3379,7 +3384,7 @@
             return relatedFruiting.some((entry) => entry.sourceBatchIds.includes(focused.baseBatch) || entry.sourceBatchIds.includes(focused.batch));
           })
         : harvestRows;
-      const dates = [...new Set(visibleHarvestRows.map((row) => row.date).filter(Boolean))].sort();
+      const dates = [...new Set(visibleHarvestRows.filter((row) => parseIsoDate(row.date)).map((row) => row.date))].sort();
       const daily = dates.map((date) => {
         const dayRows = visibleHarvestRows.filter((row) => row.date === date);
         return {

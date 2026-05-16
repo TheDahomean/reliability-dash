@@ -191,13 +191,18 @@ def load_sheet_rows(workbook_path: pathlib.Path, sheet_prefix: str) -> list[list
 
 
 def rows_to_records(rows: list[list[str]], header_row_index: int) -> list[dict[str, str]]:
-    header = rows[header_row_index]
+    header = [clean_string(cell) for cell in rows[header_row_index]]
     records = []
     for raw in rows[header_row_index + 1 :]:
         if not any(clean_string(cell) for cell in raw):
             continue
         padded = raw + [""] * (len(header) - len(raw))
-        records.append(dict(zip(header, padded)))
+        record = {
+            key: value
+            for key, value in zip(header, padded)
+            if key
+        }
+        records.append(record)
     return records
 
 
